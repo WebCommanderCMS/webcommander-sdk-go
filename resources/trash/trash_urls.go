@@ -10,6 +10,8 @@ const (
 
 	TrashItemRestorePath = "/api/{api_version}/admin/trash/{trash_type}/{trash_item_id}/restore"
 
+	TrashItemExternalLinksPath = "/api/{api_version}/admin/trash/{trash_type}/{trash_item_id}/external_links"
+
 	TrashBulkRestorePath = "/api/{api_version}/admin/trash/bulk-restore"
 
 	TrashBulkDeletePath = "/api/{api_version}/admin/trash/bulk-delete"

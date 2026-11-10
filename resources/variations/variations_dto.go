@@ -92,6 +92,7 @@ type ProductVariantPricing struct {
 	BasePrice      *float64
 	CostPrice      *float64
 	SalePrice      *float64
+	CompareAtPrice *float64
 	IsOnSale       *bool
 	SaleAmountType *string
 	HidePrice      *bool
@@ -255,6 +256,27 @@ type ProductVariationsImportResult struct {
 	TotalVariants *int64
 }
 
+// ProductVariantDetail is one variant read alone, under variation. It is on or off as Active, where the list and the bulk write say Available; Options name one label per type.
+type ProductVariantDetail struct {
+	VariationID     *int64
+	Name            *string
+	SKU             *string
+	CustomSKU       *string
+	Barcode         *string
+	CountryOfOrigin *string
+	HSCode          *string
+	Active          *bool
+	Options         []*ProductVariantOptionReference
+	Pricing         *ProductVariantPricing
+	Inventory       *ProductVariantInventory
+	Ordering        *ProductVariantOrdering
+	TransactionNo   *string
+	URL             *string
+}
+
+// EnvelopeKey is the key a single variant answers under.
+func (ProductVariantDetail) EnvelopeKey() string { return VariationKey }
+
 // VariationShape is the typed view of a body shaped {"variation": {…}}.
 func VariationShape(decoded any) any { return dto.Read[Variation](decoded) }
 
@@ -272,4 +294,47 @@ func ProductVariationsBulkResultShape(decoded any) any {
 // ProductVariationsImportResultShape is the typed view of the import's answer.
 func ProductVariationsImportResultShape(decoded any) any {
 	return dto.Read[ProductVariationsImportResult](decoded)
+}
+
+// ProductVariantDetailShape is the typed view of a single variant's body, {"variation": {…}}.
+func ProductVariantDetailShape(decoded any) any { return dto.Read[ProductVariantDetail](decoded) }
+
+// ProductVariantPatchInput is the single-variant patch's body, no envelope; partial. The variant is turned on or off as Available.
+type ProductVariantPatchInput struct {
+	Available       *bool
+	Name            string
+	SKU             string
+	CustomSKU       string
+	Barcode         string
+	CountryOfOrigin string
+	HSCode          string
+	Pricing         *ProductVariantPricing
+	Inventory       *ProductVariantInventory
+	Ordering        *ProductVariantOrdering
+}
+
+// ToMap renders the request body.
+func (p ProductVariantPatchInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductVariantPatched is the variant as the single-variant patch answers it: its ids and codes.
+type ProductVariantPatched struct {
+	VariationID     *int64
+	Name            *string
+	SKU             *string
+	CustomSKU       *string
+	Barcode         *string
+	CountryOfOrigin *string
+	HSCode          *string
+}
+
+// ProductVariantPatchResult is the single-variant patch's answer: Status, Message and the Variation.
+type ProductVariantPatchResult struct {
+	Status    *string
+	Message   *string
+	Variation *ProductVariantPatched
+}
+
+// ProductVariantPatchResultShape is the typed view of the single-variant patch's answer.
+func ProductVariantPatchResultShape(decoded any) any {
+	return dto.Read[ProductVariantPatchResult](decoded)
 }

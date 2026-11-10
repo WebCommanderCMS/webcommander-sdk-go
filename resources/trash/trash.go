@@ -77,6 +77,17 @@ func (t *Trash) DeleteTrashItem(ctx context.Context, trashType string, trashItem
 		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
+// GetTrashItemExternalLinks lists the links outside the store that a permanent delete of a trashed item would break — GET /admin/trash/{trash_type}/{trash_item_id}/external_links; {type, id, links}, each link {system, entity, name, external_id, reason}. An item that is not in the trash, a live one included, is 404, and a trash_type outside the list ListTrashTypes answers is 400 invalid_enum.
+func (t *Trash) GetTrashItemExternalLinks(ctx context.Context, trashType string, trashItemID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return t.requester.SendGetRequest(ctx, TrashItemExternalLinksPath, &http.RequestOptions{
+		PathParams:   map[string]any{"trash_type": trashType, "trash_item_id": trashItemID},
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: TrashExternalLinksShape})
+}
+
 // BulkRestoreTrash restores up to 100 rows — POST /admin/trash/bulk-restore with {"items": [{"type", "id"}]}; 200 when every item is restored, 207 with the same body when any fails.
 func (t *Trash) BulkRestoreTrash(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {

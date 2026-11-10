@@ -5,6 +5,8 @@ const (
 	AnimationEffectsPath = "/api/{api_version}/admin/settings/animation_effects"
 
 	AnimationEffectsSectionPath = "/api/{api_version}/admin/settings/animation_effects/{section}"
+
+	AnimationEffectsCustomLoaderPath = "/api/{api_version}/admin/settings/animation_effects/custom_loader"
 )
 
 // animationEffectsSections are the five values {section} takes, in facade order; all are writable.

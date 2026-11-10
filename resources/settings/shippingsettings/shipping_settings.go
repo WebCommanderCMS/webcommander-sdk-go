@@ -14,7 +14,7 @@ type ShippingSettingsResource struct {
 	requester http.Requester
 }
 
-// GetShippingSettings reads the whole area — GET /admin/settings/shipping_settings.
+// GetShippingSettings reads the whole area — GET /admin/settings/shipping_settings/general.
 func (s *ShippingSettingsResource) GetShippingSettings(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {
@@ -25,7 +25,7 @@ func (s *ShippingSettingsResource) GetShippingSettings(ctx context.Context, quer
 		ResponseFormat: format, DTOShape: ShippingSettingsShape})
 }
 
-// PatchShippingSettings writes one field or several — PATCH /admin/settings/shipping_settings, wrapped or bare; turning enable_shipping_class off also clears enable_flat_view_class.
+// PatchShippingSettings writes one field or several — PATCH /admin/settings/shipping_settings/general, wrapped or bare; turning enable_shipping_class off also clears enable_class_in_flat_view.
 func (s *ShippingSettingsResource) PatchShippingSettings(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (s *ShippingSettingsResource) PatchShippingSettings(ctx context.Context, pa
 		ResponseFormat: format, DTOShape: ShippingSettingsShape})
 }
 
-// HeadShippingSettings asks whether the area is reachable — HEAD /admin/settings/shipping_settings.
+// HeadShippingSettings asks whether the area is reachable — HEAD /admin/settings/shipping_settings/general.
 func (s *ShippingSettingsResource) HeadShippingSettings(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {

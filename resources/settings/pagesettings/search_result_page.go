@@ -171,6 +171,16 @@ func (s *SearchResultPageSettings) DeleteSearchResultPageProductPromotion(ctx co
 		ResponseFormat: format})
 }
 
+// ReindexSearch rebuilds the store's search index — POST /admin/search/reindex, no body, answered 202 once the rebuild has started. It covers the whole store; the run is read with GetSearchSettingsReindexStatus.
+func (s *SearchResultPageSettings) ReindexSearch(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return s.requester.SendPostRequest(ctx, SearchReindexPath, &http.RequestOptions{
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: SearchReindexShape})
+}
+
 // ResourceName is this resource's registry key — what ListResourceNames returns, snake_case.
 const ResourceName = "search_result_page"
 

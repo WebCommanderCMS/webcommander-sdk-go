@@ -9,12 +9,12 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/http"
 )
 
-// TaxSettingsResource is the flat tax settings facade, bound to one client: GET and PUT, and no HEAD.
+// TaxSettingsResource is the flat tax settings facade, bound to one client: GET, PUT, PATCH and HEAD.
 type TaxSettingsResource struct {
 	requester http.Requester
 }
 
-// GetTaxSettings reads the tax settings — GET /admin/tax/settings, nine keys under tax_settings.
+// GetTaxSettings reads the tax settings — GET /admin/settings/tax, nine keys under tax_settings, with group_meta.
 func (t *TaxSettingsResource) GetTaxSettings(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {
@@ -25,7 +25,7 @@ func (t *TaxSettingsResource) GetTaxSettings(ctx context.Context, queryParams ma
 		ResponseFormat: format, DTOShape: TaxSettingsShape})
 }
 
-// PutTaxSettings merges into the tax settings — PUT /admin/tax/settings, wrapped in settings, not tax_settings.
+// PutTaxSettings merges into the tax settings — PUT /admin/settings/tax, wrapped in tax_settings.
 func (t *TaxSettingsResource) PutTaxSettings(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
 		return nil, err
@@ -37,6 +37,30 @@ func (t *TaxSettingsResource) PutTaxSettings(ctx context.Context, payload any, r
 	return t.requester.SendPutRequest(ctx, TaxSettingsPath, &http.RequestOptions{
 		JSONBody: payload, RaiseOnError: raiseOnError,
 		ResponseFormat: format, DTOShape: TaxSettingsShape})
+}
+
+// PatchTaxSettings writes one field or several — PATCH /admin/settings/tax, wrapped in tax_settings; it merges like the PUT.
+func (t *TaxSettingsResource) PatchTaxSettings(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return t.requester.SendPatchRequest(ctx, TaxSettingsPath, &http.RequestOptions{
+		JSONBody: payload, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: TaxSettingsShape})
+}
+
+// HeadTaxSettings asks whether the tax settings are reachable — HEAD /admin/settings/tax; no body.
+func (t *TaxSettingsResource) HeadTaxSettings(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return t.requester.SendApiRequest(ctx, "HEAD", TaxSettingsPath, &http.RequestOptions{
+		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // ResourceName is this resource's registry key — what ListResourceNames returns, snake_case.

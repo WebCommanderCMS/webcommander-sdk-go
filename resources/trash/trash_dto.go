@@ -93,3 +93,22 @@ func TrashBulkRestoreResultShape(decoded any) any { return dto.Read[TrashBulkRes
 
 // TrashBulkDeleteResultShape is the typed view of the bulk delete's body.
 func TrashBulkDeleteResultShape(decoded any) any { return dto.Read[TrashBulkDeleteResult](decoded) }
+
+// TrashExternalLink is one link outside the store: the System, its Entity and ExternalID, a Name and the Reason it blocks a permanent delete.
+type TrashExternalLink struct {
+	System     *string
+	Entity     *string
+	Name       *string
+	ExternalID *string
+	Reason     *string
+}
+
+// TrashExternalLinks is the external links of one trashed item: its Type and ID, and Links.
+type TrashExternalLinks struct {
+	Type  *string
+	ID    *int64
+	Links []*TrashExternalLink
+}
+
+// TrashExternalLinksShape is the typed view of the external links' body.
+func TrashExternalLinksShape(decoded any) any { return dto.Read[TrashExternalLinks](decoded) }

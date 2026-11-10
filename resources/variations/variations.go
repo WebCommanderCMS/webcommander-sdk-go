@@ -167,6 +167,53 @@ func (v *VariationsResource) UpdateProductVariations(ctx context.Context, produc
 		ResponseFormat: format, DTOShape: ProductVariationsBulkResultShape})
 }
 
+// GetProductVariation reads one variant under variation — GET /admin/products/{product_id}/variations/{variation_id}. variationID is a variant's variation_id, the id the list also carries; it is not the variant's own product_id. It reads active where the list reads available.
+func (v *VariationsResource) GetProductVariation(ctx context.Context, productID any, variationID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return v.requester.SendGetRequest(ctx, ProductVariationPath, &http.RequestOptions{
+		PathParams:   map[string]any{"product_id": productID, "variation_id": variationID},
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductVariantDetailShape})
+}
+
+// DeleteProductVariation deletes one variant; 204, and a second delete is 404. variationID is a variant's variation_id. DELETE /admin/products/{product_id}/variations/{variation_id}
+func (v *VariationsResource) DeleteProductVariation(ctx context.Context, productID any, variationID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return v.requester.SendDeleteRequest(ctx, ProductVariationPath, &http.RequestOptions{
+		PathParams:   map[string]any{"product_id": productID, "variation_id": variationID},
+		RaiseOnError: raiseOnError, ResponseFormat: format})
+}
+
+// PatchProductVariation changes one variant — PATCH /admin/products/{product_id}/variations/{variation_id}, a bare, partial body answered 200 with the variant's ids and codes only. A SKU another variant holds is 409, one over 255 characters 400, an empty body 400, and a variant the product does not hold 404; unknown keys are ignored.
+func (v *VariationsResource) PatchProductVariation(ctx context.Context, productID any, variationID any, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return v.requester.SendPatchRequest(ctx, ProductVariationPath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID, "variation_id": variationID}, JSONBody: payload,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductVariantPatchResultShape})
+}
+
+// DeleteProductVariations deletes every variant of a product; 204, also when it has none. DELETE /admin/products/{product_id}/variations
+func (v *VariationsResource) DeleteProductVariations(ctx context.Context, productID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return v.requester.SendDeleteRequest(ctx, ProductVariationsPath, &http.RequestOptions{
+		PathParams:   map[string]any{"product_id": productID},
+		RaiseOnError: raiseOnError, ResponseFormat: format})
+}
+
 // ResourceName is this resource's registry key — what ListResourceNames returns, snake_case.
 const ResourceName = "variations"
 

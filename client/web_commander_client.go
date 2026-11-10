@@ -33,11 +33,18 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/currencies"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/customergroups"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/customers"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardbanners"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardkpis"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardreports"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboards"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardsections"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/discountprofiles"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/email"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/giftcards"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/inventorylocations"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/ordercustomfields"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderflags"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderpreviews"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orders"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/pages"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/paymentgateways"
@@ -54,6 +61,9 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/settings/sitesettings"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingclasses"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingmethods"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingprofiles"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingrates"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingrules"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcodes"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcountrytaxes"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcustomprofiles"
@@ -101,6 +111,7 @@ type WebCommanderClient struct {
 	searchSettings       lazy[*searchsettings.SearchSettingsResource]
 	ecommerceSettings    lazy[*ecommercesettings.EcommerceSettingsResource]
 	orderFlags           lazy[*orderflags.OrderFlags]
+	orderPreviews        lazy[*orderpreviews.OrderPreviews]
 	orders               lazy[*orders.Orders]
 	inventoryLocations   lazy[*inventorylocations.InventoryLocations]
 	products             lazy[*products.Products]
@@ -117,6 +128,9 @@ type WebCommanderClient struct {
 	paymentGateways      lazy[*paymentgateways.PaymentGateways]
 	shippingClasses      lazy[*shippingclasses.ShippingClasses]
 	shippingMethods      lazy[*shippingmethods.ShippingMethods]
+	shippingProfiles     lazy[*shippingprofiles.ShippingProfiles]
+	shippingRates        lazy[*shippingrates.ShippingRates]
+	shippingRules        lazy[*shippingrules.ShippingRules]
 	taxCodes             lazy[*taxcodes.TaxCodes]
 	taxProfiles          lazy[*taxprofiles.TaxProfiles]
 	taxRules             lazy[*taxrules.TaxRules]
@@ -124,12 +138,18 @@ type WebCommanderClient struct {
 	taxSettings          lazy[*taxsettings.TaxSettingsResource]
 	taxCountryTaxes      lazy[*taxcountrytaxes.TaxCountryTaxes]
 	taxCustomProfiles    lazy[*taxcustomprofiles.TaxCustomProfiles]
+	dashboardBanners     lazy[*dashboardbanners.DashboardBanners]
+	dashboardKPIs        lazy[*dashboardkpis.DashboardKPIs]
+	dashboardReports     lazy[*dashboardreports.DashboardReports]
+	dashboards           lazy[*dashboards.Dashboards]
+	dashboardSections    lazy[*dashboardsections.DashboardSections]
 	discountProfiles     lazy[*discountprofiles.DiscountProfiles]
 	customerGroups       lazy[*customergroups.CustomerGroups]
 	variations           lazy[*variations.VariationsResource]
 	transactions         lazy[*transactions.Transactions]
 	trash                lazy[*trash.Trash]
 	email                lazy[*email.Email]
+	giftCards            lazy[*giftcards.GiftCards]
 	pages                lazy[*pages.Pages]
 }
 
@@ -432,6 +452,11 @@ func (c *WebCommanderClient) OrderFlags() *orderflags.OrderFlags {
 	return c.orderFlags.get(func() *orderflags.OrderFlags { return orderflags.New(c) })
 }
 
+// OrderPreviews is built and cached on first use.
+func (c *WebCommanderClient) OrderPreviews() *orderpreviews.OrderPreviews {
+	return c.orderPreviews.get(func() *orderpreviews.OrderPreviews { return orderpreviews.New(c) })
+}
+
 // Orders is built and cached on first use.
 func (c *WebCommanderClient) Orders() *orders.Orders {
 	return c.orders.get(func() *orders.Orders { return orders.New(c) })
@@ -512,6 +537,21 @@ func (c *WebCommanderClient) ShippingMethods() *shippingmethods.ShippingMethods 
 	return c.shippingMethods.get(func() *shippingmethods.ShippingMethods { return shippingmethods.New(c) })
 }
 
+// ShippingProfiles is built and cached on first use.
+func (c *WebCommanderClient) ShippingProfiles() *shippingprofiles.ShippingProfiles {
+	return c.shippingProfiles.get(func() *shippingprofiles.ShippingProfiles { return shippingprofiles.New(c) })
+}
+
+// ShippingRates is built and cached on first use.
+func (c *WebCommanderClient) ShippingRates() *shippingrates.ShippingRates {
+	return c.shippingRates.get(func() *shippingrates.ShippingRates { return shippingrates.New(c) })
+}
+
+// ShippingRules is built and cached on first use.
+func (c *WebCommanderClient) ShippingRules() *shippingrules.ShippingRules {
+	return c.shippingRules.get(func() *shippingrules.ShippingRules { return shippingrules.New(c) })
+}
+
 // TaxCodes is built and cached on first use.
 func (c *WebCommanderClient) TaxCodes() *taxcodes.TaxCodes {
 	return c.taxCodes.get(func() *taxcodes.TaxCodes { return taxcodes.New(c) })
@@ -547,6 +587,31 @@ func (c *WebCommanderClient) TaxCustomProfiles() *taxcustomprofiles.TaxCustomPro
 	return c.taxCustomProfiles.get(func() *taxcustomprofiles.TaxCustomProfiles { return taxcustomprofiles.New(c) })
 }
 
+// DashboardBanners is built and cached on first use.
+func (c *WebCommanderClient) DashboardBanners() *dashboardbanners.DashboardBanners {
+	return c.dashboardBanners.get(func() *dashboardbanners.DashboardBanners { return dashboardbanners.New(c) })
+}
+
+// DashboardKPIs is built and cached on first use.
+func (c *WebCommanderClient) DashboardKPIs() *dashboardkpis.DashboardKPIs {
+	return c.dashboardKPIs.get(func() *dashboardkpis.DashboardKPIs { return dashboardkpis.New(c) })
+}
+
+// DashboardReports is built and cached on first use.
+func (c *WebCommanderClient) DashboardReports() *dashboardreports.DashboardReports {
+	return c.dashboardReports.get(func() *dashboardreports.DashboardReports { return dashboardreports.New(c) })
+}
+
+// Dashboards is built and cached on first use.
+func (c *WebCommanderClient) Dashboards() *dashboards.Dashboards {
+	return c.dashboards.get(func() *dashboards.Dashboards { return dashboards.New(c) })
+}
+
+// DashboardSections is built and cached on first use.
+func (c *WebCommanderClient) DashboardSections() *dashboardsections.DashboardSections {
+	return c.dashboardSections.get(func() *dashboardsections.DashboardSections { return dashboardsections.New(c) })
+}
+
 // DiscountProfiles is built and cached on first use.
 func (c *WebCommanderClient) DiscountProfiles() *discountprofiles.DiscountProfiles {
 	return c.discountProfiles.get(func() *discountprofiles.DiscountProfiles { return discountprofiles.New(c) })
@@ -575,6 +640,11 @@ func (c *WebCommanderClient) Trash() *trash.Trash {
 // Email is built and cached on first use.
 func (c *WebCommanderClient) Email() *email.Email {
 	return c.email.get(func() *email.Email { return email.New(c) })
+}
+
+// GiftCards is built and cached on first use.
+func (c *WebCommanderClient) GiftCards() *giftcards.GiftCards {
+	return c.giftCards.get(func() *giftcards.GiftCards { return giftcards.New(c) })
 }
 
 // Pages is built and cached on first use.

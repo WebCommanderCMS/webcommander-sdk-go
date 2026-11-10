@@ -4,37 +4,73 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/dto"
 )
 
-// TaxSettings is the nine keys the facade sends, flat; DefaultTaxProfile follows the default tax profile.
-type TaxSettings struct {
-	ConfigurationType  *string
-	SystemDefaultTax   *bool
-	DefaultCountry     *string
-	CustomTaxProfileID *int64
-	DefaultTaxProfile  *int64
-	ShowPriceWithTax   *bool
-	IsPriceWithTax     *bool
-	DefaultTaxCode     *string
-	TaxMessage         *string
+// TaxRegion is the country tax the store charges by default, as tax_region reads it.
+type TaxRegion struct {
+	CountryTaxID *int64
+	CountryCode  *string
+	CountryName  *string
 }
 
-// EnvelopeKey is the key the read answers under, and the write's answer too; the write takes another.
+// TaxProfileReference is a custom tax profile as a read names it: its id and name, or null.
+type TaxProfileReference struct {
+	ID   *int64
+	Name *string
+}
+
+// TaxSettingsAreaMeta is one group_meta entry: what the area is, whether it can be written, and its path.
+type TaxSettingsAreaMeta struct {
+	Kind     *string
+	Writable *bool
+	Href     *string
+}
+
+// TaxSettingsGroupMeta is the group_meta block: the settings area and the two tax collections beside it.
+type TaxSettingsGroupMeta struct {
+	TaxSettings *TaxSettingsAreaMeta
+	TaxProfiles *TaxSettingsAreaMeta
+	TaxRules    *TaxSettingsAreaMeta
+}
+
+// TaxSettings is the nine keys under tax_settings, with GroupMeta and, when asked for, FieldMetadata.
+type TaxSettings struct {
+	TaxRateForCustomers  *string
+	TaxRegion            *TaxRegion
+	CustomTaxProfile     *TaxProfileReference
+	IsPriceShownWithTax  *bool
+	PricesInCatalog      *string
+	CalculatedBy         *string
+	IsOutOfRegionTaxFree *bool
+	TaxMessage           *string
+	BasePriceRounding    *string
+	GroupMeta            *TaxSettingsGroupMeta
+	FieldMetadata        any
+}
+
+// EnvelopeKey is the key the read answers under, and the write's answer too.
 func (TaxSettings) EnvelopeKey() string { return TaxSettingsKey }
 
-// TaxSettingsInput is the PUT's body, wrapped in settings; the write merges.
-type TaxSettingsInput struct {
-	ConfigurationType string
-	// Pointers, so an unset flag or number is omitted rather than cleared by the merge.
-	SystemDefaultTax   *bool
-	DefaultCountry     string
-	CustomTaxProfileID *int64
-	DefaultTaxProfile  *int64
-	ShowPriceWithTax   *bool
-	IsPriceWithTax     *bool
-	DefaultTaxCode     string
-	TaxMessage         string
+// TaxRegionInput is tax_region as a write takes it: a CountryCode (with an optional StateCode) or a CountryTaxID.
+type TaxRegionInput struct {
+	CountryTaxID *int64
+	CountryCode  string
+	StateCode    string
 }
 
-// EnvelopeKey is the settings wrapper, not the key the read answers under.
+// TaxSettingsInput is the body PUT and PATCH take, wrapped in tax_settings; both merge.
+// The profile is written as CustomTaxProfileID; calculated_by is read-only.
+type TaxSettingsInput struct {
+	TaxRateForCustomers string
+	TaxRegion           *TaxRegionInput
+	CustomTaxProfileID  *int64
+	// Pointers, so an unset flag is omitted rather than cleared by the merge.
+	IsPriceShownWithTax  *bool
+	PricesInCatalog      string
+	IsOutOfRegionTaxFree *bool
+	TaxMessage           string
+	BasePriceRounding    string
+}
+
+// EnvelopeKey is the tax_settings wrapper, the same key the read answers under.
 func (TaxSettingsInput) EnvelopeKey() string { return TaxSettingsWriteKey }
 
 // ToMap renders the request body.

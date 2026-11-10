@@ -288,7 +288,7 @@ type ProductReviewer struct {
 	Email *string
 }
 
-// ProductReview is one review. ReviewedProductID, Comment and CreatedAt repeat productId, review and date; CreatedAt carries a Z.
+// ProductReview is one review. ReviewedProductID, Comment and CreatedAt repeat productId, review and date; CreatedAt carries a Z. A single review answers under review, which inside a row is its text.
 type ProductReview struct {
 	ID *int64
 	// ProductID travels as productId, the camelCase key in the body.
@@ -306,6 +306,9 @@ type ProductReview struct {
 	Comment           *string
 	CreatedAt         *string
 }
+
+// EnvelopeKey is the key a single review answers under.
+func (ProductReview) EnvelopeKey() string { return ProductReviewKey }
 
 // ProductVariationTypeOption is one option of a variation type the product uses.
 type ProductVariationTypeOption struct {
@@ -887,6 +890,163 @@ type ProductStockInput struct {
 
 func (p ProductStockInput) ToMap() map[string]any { return dto.ToMap(p) }
 
+// ProductCount is the count's answer; Count repeats Total.
+type ProductCount struct {
+	Total *int64
+	Count *int64
+}
+
+// ProductSkuHolder is the product that holds a SKU; Status is trashed for one in the trash.
+type ProductSkuHolder struct {
+	ID     *int64
+	Name   *string
+	Status *string
+}
+
+// ProductSkuCheck is a SKU's verdict: Available and IsExist are opposites, Product and ID name the holder and are nil when the SKU is free. A variant's SKU names the variant's own product.
+type ProductSkuCheck struct {
+	Available *bool
+	IsExist   *bool
+	Product   *ProductSkuHolder
+	ID        *int64
+}
+
+// ProductSpecial is one row of a special listing: a product's storefront prices.
+type ProductSpecial struct {
+	ID                      *int64
+	SKU                     *string
+	Name                    *string
+	Image                   *string
+	BasePrice               *float64
+	IsOnSale                *bool
+	OnSaleAmountType        *string
+	EffectivePrice          *float64
+	ActualBasePrice         *float64
+	OnSaleAmount            *float64
+	ExpectToPayPrice        *float64
+	ExpectToPayPriceWithTax *float64
+	TaxExclusiveBasePrice   *float64
+	TaxExclusiveSalePrice   *float64
+	Tax                     *float64
+	PreviousPriceToDisplay  *float64
+	ActualPriceToDisplay    *float64
+	SalePrice               *float64
+	Updated                 *string
+	URL                     *string
+	Summary                 *string
+	Description             *string
+}
+
+// ProductSpecialPage is a special listing. Max is the page size applied; Status is success on a per-customer answer with no rows, and absent otherwise.
+type ProductSpecialPage struct {
+	Status     *string
+	Total      *int64
+	Max        *int64
+	Offset     *int64
+	Products   []*ProductSpecial
+	Pagination *Pagination
+}
+
+// ProductsBulkDeleteInput is the bulk delete's body, no envelope: IDs is required and must not be empty.
+type ProductsBulkDeleteInput struct {
+	IDs []int64 `wire:"ids"`
+}
+
+// ToMap renders the request body.
+func (p ProductsBulkDeleteInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductBulkDeleteError is one id the bulk delete did not trash; Reason is not_found for an unknown id.
+type ProductBulkDeleteError struct {
+	ID     *int64
+	Reason *string
+}
+
+// ProductsBulkDeleteResult is the bulk delete's answer, 200 even when an id failed: counts, and the failed ids.
+type ProductsBulkDeleteResult struct {
+	Deleted *int64
+	Failed  *int64
+	Errors  []*ProductBulkDeleteError
+}
+
+// ProductReviewList is one product's reviews; the listing has no paging block.
+type ProductReviewList struct {
+	Reviews []*ProductReview
+}
+
+// ProductReviewPatchInput is the review moderation body, no envelope; Status is pending or approved.
+type ProductReviewPatchInput struct {
+	Status  string
+	Rating  *float64
+	Comment string
+}
+
+// ToMap renders the request body.
+func (p ProductReviewPatchInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductImageFileInput is one image to store: Filename and its Base64 content.
+type ProductImageFileInput struct {
+	Filename string
+	Base64   string `wire:"base64"`
+}
+
+// ProductImageAndVideoInput is the image_and_video block of an image upload.
+type ProductImageAndVideoInput struct {
+	Images []*ProductImageFileInput
+}
+
+// ProductImageUploadInput is the image upload's body, {"product": {"image_and_video": {"images": [...]}}}.
+type ProductImageUploadInput struct {
+	ImageAndVideo *ProductImageAndVideoInput
+}
+
+// EnvelopeKey is the key the upload's body is wrapped in.
+func (ProductImageUploadInput) EnvelopeKey() string { return ProductKey }
+
+// ToMap renders the request body.
+func (p ProductImageUploadInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductMediaUploaded is what an image upload answers: Product holds the files just stored, TransactionNo is the product's own.
+type ProductMediaUploaded struct {
+	Product       *ProductImageAndVideo
+	TransactionNo *string
+}
+
+// ProductMediaUploadInput is the media upload's body, no envelope: Type (only images is accepted), Filename and Content, base64 or a data: URI. Position is in the collection and refused unknown_field by the store.
+type ProductMediaUploadInput struct {
+	Type     string
+	Filename string
+	Content  string
+	Position *int64
+}
+
+// ToMap renders the request body.
+func (p ProductMediaUploadInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductInventoryStockInput is the stock figures a top-up writes.
+type ProductInventoryStockInput struct {
+	TrackInventory bool
+	AvailableStock *int64
+	LowLevelStock  *int64
+}
+
+// ProductInventoryInput is the top-up's body, {"product": {"product_pricing_and_stock": {...}}}.
+type ProductInventoryInput struct {
+	ProductPricingAndStock *ProductInventoryStockInput
+}
+
+// EnvelopeKey is the key the top-up's body is wrapped in.
+func (ProductInventoryInput) EnvelopeKey() string { return ProductKey }
+
+// ToMap renders the request body.
+func (p ProductInventoryInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductInventoryResult is the top-up's answer. TransactionNo is the product's own from before the write, nil on its first top-up, though the header is stored on the product by then.
+type ProductInventoryResult struct {
+	Status        *string
+	Message       *string
+	TransactionNo *string
+}
+
 // ProductPageShape is the typed view of the listing body, {"products": […], "pagination": {…}}.
 func ProductPageShape(decoded any) any { return dto.Read[ProductPage](decoded) }
 
@@ -898,3 +1058,235 @@ func ProductReviewsShape(decoded any) any { return dto.Read[ProductReviews](deco
 
 // ProductStockShape is the typed view of the stock sub-path's body.
 func ProductStockShape(decoded any) any { return dto.Read[ProductStock](decoded) }
+
+// ProductCountShape is the typed view of the count's answer.
+func ProductCountShape(decoded any) any { return dto.Read[ProductCount](decoded) }
+
+// ProductSkuCheckShape is the typed view of the SKU check's answer.
+func ProductSkuCheckShape(decoded any) any { return dto.Read[ProductSkuCheck](decoded) }
+
+// ProductSpecialPageShape is the typed view of a special listing.
+func ProductSpecialPageShape(decoded any) any { return dto.Read[ProductSpecialPage](decoded) }
+
+// ProductsBulkDeleteResultShape is the typed view of the bulk delete's answer.
+func ProductsBulkDeleteResultShape(decoded any) any {
+	return dto.Read[ProductsBulkDeleteResult](decoded)
+}
+
+// ProductReviewListShape is the typed view of one product's review listing.
+func ProductReviewListShape(decoded any) any { return dto.Read[ProductReviewList](decoded) }
+
+// ProductReviewShape is the typed view of a body shaped {"review": {…}}.
+func ProductReviewShape(decoded any) any { return dto.Read[ProductReview](decoded) }
+
+// ProductMediaImageShape is the typed view of the media upload's answer, one flat image row.
+func ProductMediaImageShape(decoded any) any { return dto.Read[ProductMediaImage](decoded) }
+
+// ProductMediaUploadedShape is the typed view of an image or media upload's answer.
+func ProductMediaUploadedShape(decoded any) any { return dto.Read[ProductMediaUploaded](decoded) }
+
+// ProductInventoryResultShape is the typed view of the top-up's answer.
+func ProductInventoryResultShape(decoded any) any { return dto.Read[ProductInventoryResult](decoded) }
+
+// ProductMediaOrderInput is the media order body, no envelope: Type images and every image's id once, in the order wanted.
+type ProductMediaOrderInput struct {
+	Type string
+	Ids  []int64
+}
+
+// ToMap renders the request body.
+func (p ProductMediaOrderInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductMediaOrder is the media order's answer: the product's images in their new order.
+type ProductMediaOrder struct {
+	Images []*ProductMediaImage
+}
+
+// ProductMediaImagePatchInput is the image move body, no envelope: the 1-based Position, the only field it takes.
+type ProductMediaImagePatchInput struct {
+	Position *int64
+}
+
+// ToMap renders the request body.
+func (p ProductMediaImagePatchInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductSeoAdvancedSettings is the robots and canonical URL settings.
+type ProductSeoAdvancedSettings struct {
+	Enabled      *bool
+	RobotsMeta   *string
+	CanonicalURL *string
+}
+
+// ProductSeoGoogleAnalyticsEvents is which Google Analytics events the product page sends.
+type ProductSeoGoogleAnalyticsEvents struct {
+	Enabled         *bool
+	ViewItem        *bool
+	ViewItemList    *bool
+	ViewCart        *bool
+	AddToWishList   *bool
+	RemoveFromCart  *bool
+	BeginCheckout   *bool
+	AddShippingInfo *bool
+	AddPaymentInfo  *bool
+	Purchase        *bool
+}
+
+// ProductSeoGoogleAnalytics is Google Analytics on the product page.
+type ProductSeoGoogleAnalytics struct {
+	Enabled       *bool
+	MeasurementID *string
+	Events        *ProductSeoGoogleAnalyticsEvents
+}
+
+// ProductSeoFacebookPixelEvents is which Facebook Pixel events the product page sends.
+type ProductSeoFacebookPixelEvents struct {
+	Enabled          *bool
+	Search           *bool
+	AddToCart        *bool
+	AddToWishList    *bool
+	InitiateCheckout *bool
+	AddPaymentInfo   *bool
+	Purchase         *bool
+}
+
+// ProductSeoFacebookPixel is the Facebook Pixel on the product page.
+type ProductSeoFacebookPixel struct {
+	Enabled *bool
+	PixelID *string
+	Events  *ProductSeoFacebookPixelEvents
+}
+
+// ProductSeoGoogleAds is the Google Ads conversion the product page reports.
+type ProductSeoGoogleAds struct {
+	ConversionID    *string
+	ConversionLabel *string
+}
+
+// ProductSeoAnalytics is the product page's analytics settings.
+type ProductSeoAnalytics struct {
+	Enabled         *bool
+	Platform        *string
+	GoogleAnalytics *ProductSeoGoogleAnalytics
+	FacebookPixel   *ProductSeoFacebookPixel
+	GoogleAds       *ProductSeoGoogleAds
+}
+
+// ProductSeoCode is one custom code block and whether it is on.
+type ProductSeoCode struct {
+	Enabled *bool
+	Code    *string
+}
+
+// ProductSeoCustomCode is the custom code added to the product page's header and footer.
+type ProductSeoCustomCode struct {
+	Header *ProductSeoCode
+	Footer *ProductSeoCode
+}
+
+// ProductSeoSocialCard is the title, description and image one network shows for the product.
+type ProductSeoSocialCard struct {
+	Title       *string
+	Description *string
+	ImageURL    *string
+}
+
+// ProductSeoSocial is the product's social card, and one per network.
+type ProductSeoSocial struct {
+	Title       *string
+	Description *string
+	ImageURL    *string
+	Facebook    *ProductSeoSocialCard
+	Twitter     *ProductSeoSocialCard
+	Linkedin    *ProductSeoSocialCard
+}
+
+// ProductSeoAiVisibility is what the product offers AI search; each field is nil until set.
+type ProductSeoAiVisibility struct {
+	StructuredAttributes any
+	ProductFaq           any
+	CitabilityScore      any
+	JSONLd               any
+}
+
+// ProductSeo is a product's SEO sub-resource, under seo.
+type ProductSeo struct {
+	URLHandle        *string
+	Title            *string
+	Description      *string
+	AdvancedSettings *ProductSeoAdvancedSettings
+	Analytics        *ProductSeoAnalytics
+	CustomCode       *ProductSeoCustomCode
+	Social           *ProductSeoSocial
+	AiVisibility     *ProductSeoAiVisibility
+}
+
+// EnvelopeKey is the key the SEO read answers under.
+func (ProductSeo) EnvelopeKey() string { return ProductSeoKey }
+
+// ProductStockTracking is a product's stock figure and low-stock level, with whether tracking is on.
+type ProductStockTracking struct {
+	Enabled        *bool
+	AvailableStock *int64
+	LowStockLevel  *int64
+}
+
+// ProductStockSummary is the stock block of the stock patch's answer.
+type ProductStockSummary struct {
+	Tracking             *ProductStockTracking
+	MultiLocationEnabled *bool
+	Locations            []*ProductStockLocation
+	Variations           []*ProductStockVariation
+}
+
+// ProductStockAdjustmentUser is the admin who made a stock change.
+type ProductStockAdjustmentUser struct {
+	ID   *int64
+	Name *string
+}
+
+// ProductStockAdjustment is one stock change; Delta is the new figure minus the old.
+type ProductStockAdjustment struct {
+	ID            *int64
+	Delta         *int64
+	Note          *string
+	TransactionNo *string
+	CreatedBy     *ProductStockAdjustmentUser
+	CreatedAt     *string
+}
+
+// ProductStockPatchInput is the stock patch's body, no envelope. Tracking merges; Locations sets the stock per location; Note and TransactionNo go on the adjustment.
+type ProductStockPatchInput struct {
+	Tracking      *ProductStockTracking
+	Locations     []*ProductStockLocationInput
+	Note          string
+	TransactionNo string
+}
+
+// ToMap renders the request body.
+func (p ProductStockPatchInput) ToMap() map[string]any { return dto.ToMap(p) }
+
+// ProductStockPatchResult is the stock patch's answer: the stock now, and the adjustment it recorded.
+type ProductStockPatchResult struct {
+	Stock      *ProductStockSummary
+	Adjustment *ProductStockAdjustment
+}
+
+// ProductStockAdjustmentPage is one page of a product's stock history.
+type ProductStockAdjustmentPage struct {
+	Adjustments []*ProductStockAdjustment
+	Pagination  *Pagination
+}
+
+// ProductMediaOrderShape is the typed view of the media order's answer.
+func ProductMediaOrderShape(decoded any) any { return dto.Read[ProductMediaOrder](decoded) }
+
+// ProductSeoShape is the typed view of a body shaped {"seo": {…}}.
+func ProductSeoShape(decoded any) any { return dto.Read[ProductSeo](decoded) }
+
+// ProductStockPatchResultShape is the typed view of the stock patch's answer.
+func ProductStockPatchResultShape(decoded any) any { return dto.Read[ProductStockPatchResult](decoded) }
+
+// ProductStockAdjustmentPageShape is the typed view of a page of stock history.
+func ProductStockAdjustmentPageShape(decoded any) any {
+	return dto.Read[ProductStockAdjustmentPage](decoded)
+}

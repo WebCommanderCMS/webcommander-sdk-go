@@ -24,11 +24,18 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/currencies"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/customergroups"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/customers"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardbanners"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardkpis"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardreports"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboards"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardsections"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/discountprofiles"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/email"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/giftcards"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/inventorylocations"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/ordercustomfields"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderflags"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderpreviews"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orders"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/pages"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/paymentgateways"
@@ -45,6 +52,9 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/settings/sitesettings"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingclasses"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingmethods"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingprofiles"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingrates"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingrules"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcodes"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcountrytaxes"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcustomprofiles"
@@ -522,6 +532,8 @@ type (
 	// SearchResultPageGroupMeta and SearchResultPageSectionMeta are the area's GroupMeta and SectionMeta.
 	SearchResultPageGroupMeta   = pagesettings.GroupMeta
 	SearchResultPageSectionMeta = pagesettings.SectionMeta
+	// SearchReindex is the reindex trigger's answer.
+	SearchReindex = pagesettings.SearchReindex
 )
 
 // NewSearchResultPageSettings binds the resource to a requester of your own.
@@ -532,6 +544,9 @@ func NewSearchResultPageSettings(requester Requester) *SearchResultPageSettings 
 // SearchResultPageShape is the DTOShape for the facade's body and for one section's.
 func SearchResultPageShape(decoded any) any { return pagesettings.SearchResultPageShape(decoded) }
 
+// SearchReindexShape is the DTOShape for the reindex trigger's answer.
+func SearchReindexShape(decoded any) any { return pagesettings.SearchReindexShape(decoded) }
+
 // ProductPromotionShape is the DTOShape for a body shaped {"product_promotion": {…}}.
 func ProductPromotionShape(decoded any) any { return pagesettings.ProductPromotionShape(decoded) }
 
@@ -541,6 +556,7 @@ func SearchResultPageSections() []string { return pagesettings.SearchResultPageS
 const (
 	SearchResultPagePath        = pagesettings.SearchResultPagePath
 	SearchResultPageSectionPath = pagesettings.SearchResultPageSectionPath
+	SearchReindexPath           = pagesettings.SearchReindexPath
 
 	SearchResultPageProductPromotionsPath      = pagesettings.SearchResultPageProductPromotionsPath
 	SearchResultPageProductPromotionPath       = pagesettings.SearchResultPageProductPromotionPath
@@ -774,8 +790,10 @@ type (
 	ImageLazyEffect  = animationeffects.ImageLazyEffect
 	PageSkeleton     = animationeffects.PageSkeleton
 	// CustomLoader is the read-only loader block, and PreloaderPage the entry behind its one list.
-	CustomLoader  = animationeffects.CustomLoader
-	PreloaderPage = animationeffects.PreloaderPage
+	CustomLoader = animationeffects.CustomLoader
+	// CustomLoaderSection is the upload's answer, the loader under custom_loader.
+	CustomLoaderSection = animationeffects.CustomLoaderSection
+	PreloaderPage       = animationeffects.PreloaderPage
 	// AnimationEffectsGroupMeta and AnimationEffectsSectionMeta are the area's GroupMeta and SectionMeta.
 	AnimationEffectsGroupMeta   = animationeffects.GroupMeta
 	AnimationEffectsSectionMeta = animationeffects.SectionMeta
@@ -789,12 +807,18 @@ func NewAnimationEffectsSettings(requester Requester) *AnimationEffectsSettings 
 // AnimationEffectsShape is the DTOShape for the facade's body and for one section's.
 func AnimationEffectsShape(decoded any) any { return animationeffects.AnimationEffectsShape(decoded) }
 
+// CustomLoaderSectionShape is the DTOShape for the custom loader upload's answer.
+func CustomLoaderSectionShape(decoded any) any {
+	return animationeffects.CustomLoaderSectionShape(decoded)
+}
+
 // AnimationEffectsSections returns a fresh copy of the five values {section} takes.
 func AnimationEffectsSections() []string { return animationeffects.AnimationEffectsSections() }
 
 const (
-	AnimationEffectsPath        = animationeffects.AnimationEffectsPath
-	AnimationEffectsSectionPath = animationeffects.AnimationEffectsSectionPath
+	AnimationEffectsPath             = animationeffects.AnimationEffectsPath
+	AnimationEffectsSectionPath      = animationeffects.AnimationEffectsSectionPath
+	AnimationEffectsCustomLoaderPath = animationeffects.AnimationEffectsCustomLoaderPath
 )
 
 // ProductListingSettingsResource is the product listing settings endpoints bound to a client.
@@ -973,7 +997,7 @@ type (
 	ProfileReference = shippingsettings.ProfileReference
 	// ShippingSettingsGroupMeta is the area's GroupMeta.
 	ShippingSettingsGroupMeta = shippingsettings.GroupMeta
-	// AreaMeta is the area's one metadata entry, two fields wide with no href.
+	// AreaMeta is one group_meta entry: kind, writable and href.
 	AreaMeta = shippingsettings.AreaMeta
 )
 
@@ -1738,6 +1762,57 @@ type (
 	ProductTax                       = products.ProductTax
 	ProductShipping                  = products.ProductShipping
 	ProductLinks                     = products.ProductLinks
+	// ProductCount is the count's answer; ProductSkuCheck the SKU check's, with ProductSkuHolder the product holding it.
+	ProductCount     = products.ProductCount
+	ProductSkuCheck  = products.ProductSkuCheck
+	ProductSkuHolder = products.ProductSkuHolder
+	// ProductSpecialPage is a special listing and ProductSpecial one of its rows.
+	ProductSpecialPage = products.ProductSpecialPage
+	ProductSpecial     = products.ProductSpecial
+	// ProductsBulkDeleteInput is the bulk delete's body, ProductsBulkDeleteResult its answer and ProductBulkDeleteError one id it refused.
+	ProductsBulkDeleteInput  = products.ProductsBulkDeleteInput
+	ProductsBulkDeleteResult = products.ProductsBulkDeleteResult
+	ProductBulkDeleteError   = products.ProductBulkDeleteError
+	// ProductReviewList is one product's reviews; ProductReviewPatchInput is the moderation body.
+	ProductReviewList       = products.ProductReviewList
+	ProductReviewPatchInput = products.ProductReviewPatchInput
+	// ProductImageUploadInput is the image upload's body, ProductImageAndVideoInput its media block and ProductImageFileInput one image.
+	ProductImageUploadInput   = products.ProductImageUploadInput
+	ProductImageAndVideoInput = products.ProductImageAndVideoInput
+	ProductImageFileInput     = products.ProductImageFileInput
+	// ProductMediaUploadInput is the media upload's body, ProductMediaUploaded what an image upload answers.
+	ProductMediaUploadInput = products.ProductMediaUploadInput
+	ProductMediaUploaded    = products.ProductMediaUploaded
+	// ProductInventoryInput is the stock top-up's body, ProductInventoryStockInput its figures and ProductInventoryResult its answer.
+	ProductInventoryInput      = products.ProductInventoryInput
+	ProductInventoryStockInput = products.ProductInventoryStockInput
+	ProductInventoryResult     = products.ProductInventoryResult
+	// ProductMediaOrderInput is the media order's body, ProductMediaOrder its answer and ProductMediaImagePatchInput the image move's body.
+	ProductMediaOrderInput      = products.ProductMediaOrderInput
+	ProductMediaOrder           = products.ProductMediaOrder
+	ProductMediaImagePatchInput = products.ProductMediaImagePatchInput
+	// ProductSeo is a product's SEO read, under seo, and the types below its parts.
+	ProductSeo                      = products.ProductSeo
+	ProductSeoAdvancedSettings      = products.ProductSeoAdvancedSettings
+	ProductSeoGoogleAnalyticsEvents = products.ProductSeoGoogleAnalyticsEvents
+	ProductSeoGoogleAnalytics       = products.ProductSeoGoogleAnalytics
+	ProductSeoFacebookPixelEvents   = products.ProductSeoFacebookPixelEvents
+	ProductSeoFacebookPixel         = products.ProductSeoFacebookPixel
+	ProductSeoGoogleAds             = products.ProductSeoGoogleAds
+	ProductSeoAnalytics             = products.ProductSeoAnalytics
+	ProductSeoCode                  = products.ProductSeoCode
+	ProductSeoCustomCode            = products.ProductSeoCustomCode
+	ProductSeoSocialCard            = products.ProductSeoSocialCard
+	ProductSeoSocial                = products.ProductSeoSocial
+	ProductSeoAiVisibility          = products.ProductSeoAiVisibility
+	// ProductStockPatchInput is the stock patch's body, ProductStockPatchResult its answer, ProductStockAdjustmentPage the history and the types below their parts.
+	ProductStockPatchInput     = products.ProductStockPatchInput
+	ProductStockPatchResult    = products.ProductStockPatchResult
+	ProductStockAdjustmentPage = products.ProductStockAdjustmentPage
+	ProductStockAdjustment     = products.ProductStockAdjustment
+	ProductStockAdjustmentUser = products.ProductStockAdjustmentUser
+	ProductStockSummary        = products.ProductStockSummary
+	ProductStockTracking       = products.ProductStockTracking
 	// ProductsProductInventory and ProductsProductRestriction are the block's inventory and one restriction.
 	ProductsProductInventory   = products.ProductInventory
 	ProductsProductRestriction = products.ProductRestriction
@@ -1766,6 +1841,53 @@ func ProductReviewsShape(decoded any) any {
 // ProductStockShape is the DTOShape for the stock sub-path's body.
 func ProductStockShape(decoded any) any {
 	return products.ProductStockShape(decoded)
+}
+
+// ProductCountShape is the DTOShape for the count's answer.
+func ProductCountShape(decoded any) any { return products.ProductCountShape(decoded) }
+
+// ProductSkuCheckShape is the DTOShape for the SKU check's answer.
+func ProductSkuCheckShape(decoded any) any { return products.ProductSkuCheckShape(decoded) }
+
+// ProductSpecialPageShape is the DTOShape for a special listing.
+func ProductSpecialPageShape(decoded any) any { return products.ProductSpecialPageShape(decoded) }
+
+// ProductsBulkDeleteResultShape is the DTOShape for the bulk delete's answer.
+func ProductsBulkDeleteResultShape(decoded any) any {
+	return products.ProductsBulkDeleteResultShape(decoded)
+}
+
+// ProductReviewListShape is the DTOShape for one product's review listing.
+func ProductReviewListShape(decoded any) any { return products.ProductReviewListShape(decoded) }
+
+// ProductReviewShape is the DTOShape for a body shaped {"review": {…}}.
+func ProductReviewShape(decoded any) any { return products.ProductReviewShape(decoded) }
+
+// ProductMediaImageShape is the DTOShape for the media upload's answer, one flat image row.
+func ProductMediaImageShape(decoded any) any { return products.ProductMediaImageShape(decoded) }
+
+// ProductMediaUploadedShape is the DTOShape for an image upload's answer.
+func ProductMediaUploadedShape(decoded any) any { return products.ProductMediaUploadedShape(decoded) }
+
+// ProductInventoryResultShape is the DTOShape for the stock top-up's answer.
+func ProductInventoryResultShape(decoded any) any {
+	return products.ProductInventoryResultShape(decoded)
+}
+
+// ProductMediaOrderShape is the DTOShape for the media order's answer.
+func ProductMediaOrderShape(decoded any) any { return products.ProductMediaOrderShape(decoded) }
+
+// ProductSeoShape is the DTOShape for a body shaped {"seo": {…}}.
+func ProductSeoShape(decoded any) any { return products.ProductSeoShape(decoded) }
+
+// ProductStockPatchResultShape is the DTOShape for the stock patch's answer.
+func ProductStockPatchResultShape(decoded any) any {
+	return products.ProductStockPatchResultShape(decoded)
+}
+
+// ProductStockAdjustmentPageShape is the DTOShape for a page of stock history.
+func ProductStockAdjustmentPageShape(decoded any) any {
+	return products.ProductStockAdjustmentPageShape(decoded)
 }
 
 // ProductQueryParams returns a fresh copy of the one name the row read accepts.
@@ -2416,14 +2538,24 @@ const (
 	TaxZonesPageSize = taxzones.TaxZonesPageSize
 )
 
-// TaxSettingsResource is the flat tax settings facade bound to a client; it serves no HEAD.
+// TaxSettingsResource is the flat tax settings facade bound to a client: GET, PUT, PATCH and HEAD.
 type TaxSettingsResource = taxsettings.TaxSettingsResource
 
 type (
-	// TaxSettings is the facade's nine keys, flat; there are no sections.
+	// TaxSettings is the facade's nine keys, flat, with GroupMeta; there are no sections.
 	TaxSettings = taxsettings.TaxSettings
-	// TaxSettingsInput is the PUT's body, enveloped as settings; the write merges.
+	// TaxRegion is the default country tax a read names under tax_region.
+	TaxRegion = taxsettings.TaxRegion
+	// TaxProfileReference is the custom tax profile a read names: its id and name.
+	TaxProfileReference = taxsettings.TaxProfileReference
+	// TaxSettingsAreaMeta is one group_meta entry: kind, writable and href.
+	TaxSettingsAreaMeta = taxsettings.TaxSettingsAreaMeta
+	// TaxSettingsGroupMeta is the group_meta block beside the settings.
+	TaxSettingsGroupMeta = taxsettings.TaxSettingsGroupMeta
+	// TaxSettingsInput is the body of PUT and PATCH, enveloped as tax_settings; both merge.
 	TaxSettingsInput = taxsettings.TaxSettingsInput
+	// TaxRegionInput is tax_region as a write takes it.
+	TaxRegionInput = taxsettings.TaxRegionInput
 )
 
 // NewTaxSettings binds the resource to a requester of your own.
@@ -2437,11 +2569,11 @@ func TaxSettingsShape(decoded any) any { return taxsettings.TaxSettingsShape(dec
 const (
 	TaxSettingsPath = taxsettings.TaxSettingsPath
 
-	// TaxSettingsKey is the key the read answers under; TaxSettingsWriteKey, a different one, wraps the PUT.
+	// TaxSettingsKey is the key the read answers under; TaxSettingsWriteKey wraps PUT and PATCH, the same key.
 	TaxSettingsKey      = taxsettings.TaxSettingsKey
 	TaxSettingsWriteKey = taxsettings.TaxSettingsWriteKey
 
-	// TaxSettingsUnknownPathMessage is the tax router's answer for a path or method it does not route.
+	// TaxSettingsUnknownPathMessage is the tax router's answer for a path or method it does not route; the old /admin/tax/settings path answers it.
 	TaxSettingsUnknownPathMessage = taxsettings.TaxSettingsUnknownPathMessage
 )
 
@@ -2772,6 +2904,12 @@ type (
 	ProductVariantInput          = variations.ProductVariantInput
 	// ProductVariationsImportResult is the import's answer.
 	ProductVariationsImportResult = variations.ProductVariationsImportResult
+	// ProductVariantDetail is one variant read alone.
+	ProductVariantDetail = variations.ProductVariantDetail
+	// ProductVariantPatchInput is the single-variant patch's body, ProductVariantPatchResult its answer and ProductVariantPatched the variant in it.
+	ProductVariantPatchInput  = variations.ProductVariantPatchInput
+	ProductVariantPatchResult = variations.ProductVariantPatchResult
+	ProductVariantPatched     = variations.ProductVariantPatched
 )
 
 // NewVariations binds the resource to a requester of your own.
@@ -2784,6 +2922,14 @@ func VariationShape(decoded any) any { return variations.VariationShape(decoded)
 
 // VariationPageShape is the DTOShape for the listing body.
 func VariationPageShape(decoded any) any { return variations.VariationPageShape(decoded) }
+
+// ProductVariantDetailShape is the DTOShape for a single variant's body.
+func ProductVariantDetailShape(decoded any) any { return variations.ProductVariantDetailShape(decoded) }
+
+// ProductVariantPatchResultShape is the DTOShape for the single-variant patch's answer.
+func ProductVariantPatchResultShape(decoded any) any {
+	return variations.ProductVariantPatchResultShape(decoded)
+}
 
 // ProductVariationsShape is the DTOShape for the product read's body.
 func ProductVariationsShape(decoded any) any { return variations.ProductVariationsShape(decoded) }
@@ -2898,6 +3044,9 @@ type (
 	// TrashBulkInput is the body both bulk calls take, with no envelope, over TrashBulkItemInput.
 	TrashBulkInput     = trash.TrashBulkInput
 	TrashBulkItemInput = trash.TrashBulkItemInput
+	// TrashExternalLinks is one trashed item's external links, each a TrashExternalLink.
+	TrashExternalLinks = trash.TrashExternalLinks
+	TrashExternalLink  = trash.TrashExternalLink
 )
 
 // NewTrash binds the resource to a requester of your own.
@@ -2912,6 +3061,9 @@ func TrashPageShape(decoded any) any { return trash.TrashPageShape(decoded) }
 // TrashTypeListShape is the DTOShape for the type list's body.
 func TrashTypeListShape(decoded any) any { return trash.TrashTypeListShape(decoded) }
 
+// TrashExternalLinksShape is the DTOShape for the external links' body.
+func TrashExternalLinksShape(decoded any) any { return trash.TrashExternalLinksShape(decoded) }
+
 // TrashBulkRestoreResultShape is the DTOShape for the bulk restore's body.
 func TrashBulkRestoreResultShape(decoded any) any { return trash.TrashBulkRestoreResultShape(decoded) }
 
@@ -2919,12 +3071,13 @@ func TrashBulkRestoreResultShape(decoded any) any { return trash.TrashBulkRestor
 func TrashBulkDeleteResultShape(decoded any) any { return trash.TrashBulkDeleteResultShape(decoded) }
 
 const (
-	TrashPath            = trash.TrashPath
-	TrashTypesPath       = trash.TrashTypesPath
-	TrashItemPath        = trash.TrashItemPath
-	TrashItemRestorePath = trash.TrashItemRestorePath
-	TrashBulkRestorePath = trash.TrashBulkRestorePath
-	TrashBulkDeletePath  = trash.TrashBulkDeletePath
+	TrashPath                  = trash.TrashPath
+	TrashTypesPath             = trash.TrashTypesPath
+	TrashItemPath              = trash.TrashItemPath
+	TrashItemRestorePath       = trash.TrashItemRestorePath
+	TrashItemExternalLinksPath = trash.TrashItemExternalLinksPath
+	TrashBulkRestorePath       = trash.TrashBulkRestorePath
+	TrashBulkDeletePath        = trash.TrashBulkDeletePath
 
 	// TrashItemsKey wraps the listing's rows and a bulk body's items, TrashTypesKey the type list.
 	TrashItemsKey = trash.TrashItemsKey
@@ -3020,3 +3173,472 @@ const (
 	// PagesIfMatchHeader is the header UpdatePage, PatchPage and DeletePage send ifMatch as.
 	PagesIfMatchHeader = pages.PagesIfMatchHeader
 )
+
+// ShippingProfiles is the shipping profile endpoints bound to a client.
+type ShippingProfiles = shippingprofiles.ShippingProfiles
+
+type (
+	// ShippingProfile is one profile, a listing row, a row path's {"shipping_profile": {…}} or a write's answer.
+	ShippingProfile = shippingprofiles.ShippingProfile
+	// ShippingProfileRule is a rule on a profile, with its rate as a ShippingProfilesReference.
+	ShippingProfileRule = shippingprofiles.ShippingProfileRule
+	// ShippingProfilesReference is an {id, name} pair: a rule's rate, or a zone the wizard names.
+	ShippingProfilesReference = shippingprofiles.ShippingReference
+	// ShippingProfileInput is the writable form for the create, the replace and the merge, wrapped in shipping_profile.
+	ShippingProfileInput = shippingprofiles.ShippingProfileInput
+	// ShippingProfileWizardInput is the wizard's body: the profile and the rules, each with its rate, to create under it.
+	ShippingProfileWizardInput = shippingprofiles.ShippingProfileWizardInput
+	ShippingProfileWizardRule  = shippingprofiles.ShippingProfileWizardRule
+	ShippingProfileWizardRate  = shippingprofiles.ShippingProfileWizardRate
+	// ShippingProfileListing is one page of the listing: rows on ShippingProfiles, beside the paging.
+	ShippingProfileListing = shippingprofiles.ShippingProfileListing
+	// ShippingProfileCount is the count sub-path's bare {"total": N}.
+	ShippingProfileCount = shippingprofiles.ShippingProfileCount
+	// ShippingProfilesPagination is the shipping profile listing's five-key pagination block.
+	ShippingProfilesPagination = shippingprofiles.Pagination
+)
+
+// NewShippingProfiles binds the resource to a requester of your own.
+func NewShippingProfiles(requester Requester) *ShippingProfiles {
+	return shippingprofiles.New(requester)
+}
+
+// ShippingProfileShape is the DTOShape for a body shaped {"shipping_profile": {…}}.
+func ShippingProfileShape(decoded any) any { return shippingprofiles.ShippingProfileShape(decoded) }
+
+// ShippingProfileListingShape is the DTOShape for the listing body.
+func ShippingProfileListingShape(decoded any) any {
+	return shippingprofiles.ShippingProfileListingShape(decoded)
+}
+
+// ShippingProfileCountShape is the DTOShape for the count sub-path's body.
+func ShippingProfileCountShape(decoded any) any {
+	return shippingprofiles.ShippingProfileCountShape(decoded)
+}
+
+const (
+	ShippingProfilesPath       = shippingprofiles.ShippingProfilesPath
+	ShippingProfilesCountPath  = shippingprofiles.ShippingProfilesCountPath
+	ShippingProfilesWizardPath = shippingprofiles.ShippingProfilesWizardPath
+	ShippingProfilePath        = shippingprofiles.ShippingProfilePath
+
+	// ShippingProfilesKey wraps the listing's rows, ShippingProfileKey one row and the writes, ShippingProfilesCountKey the count.
+	ShippingProfilesKey      = shippingprofiles.ShippingProfilesKey
+	ShippingProfileKey       = shippingprofiles.ShippingProfileKey
+	ShippingProfilesCountKey = shippingprofiles.ShippingProfilesCountKey
+
+	// ShippingProfilesPageSize is the page size when limit is not sent, ShippingProfilesPageSizeCap the largest number limit takes.
+	ShippingProfilesPageSize    = shippingprofiles.ShippingProfilesPageSize
+	ShippingProfilesPageSizeCap = shippingprofiles.ShippingProfilesPageSizeCap
+
+	// ShippingProfilesTransactionNoHeader is the header CreateShippingProfile sends transactionNo under.
+	ShippingProfilesTransactionNoHeader = shippingprofiles.ShippingProfilesTransactionNoHeader
+)
+
+// ShippingRates is the shipping rate endpoints bound to a client.
+type ShippingRates = shippingrates.ShippingRates
+
+type (
+	// ShippingRate is one rate, a listing row, a row path's {"shipping_rate": {…}} or a write's answer.
+	ShippingRate = shippingrates.ShippingRate
+	// ShippingRateCost is an amount and how it is charged; ShippingCost is the price display setting's.
+	ShippingRateCost           = shippingrates.ShippingRateCost
+	ShippingRateAdditionalRule = shippingrates.ShippingRateAdditionalRule
+	// ShippingRatesReference is an {id, name} pair: a rule that uses the rate.
+	ShippingRatesReference = shippingrates.ShippingReference
+	// ShippingRateInput is the writable form for the create, the replace and the merge, wrapped in shipping_rate.
+	ShippingRateInput = shippingrates.ShippingRateInput
+	// ShippingRateListing is one page of the listing: rows on ShippingRates, beside the paging.
+	ShippingRateListing = shippingrates.ShippingRateListing
+	// ShippingRateCount is the count sub-path's bare {"total": N}.
+	ShippingRateCount = shippingrates.ShippingRateCount
+	// ShippingRatesPagination is the shipping rate listing's five-key pagination block.
+	ShippingRatesPagination = shippingrates.Pagination
+)
+
+// NewShippingRates binds the resource to a requester of your own.
+func NewShippingRates(requester Requester) *ShippingRates { return shippingrates.New(requester) }
+
+// ShippingRateShape is the DTOShape for a body shaped {"shipping_rate": {…}}.
+func ShippingRateShape(decoded any) any { return shippingrates.ShippingRateShape(decoded) }
+
+// ShippingRateListingShape is the DTOShape for the listing body.
+func ShippingRateListingShape(decoded any) any {
+	return shippingrates.ShippingRateListingShape(decoded)
+}
+
+// ShippingRateCountShape is the DTOShape for the count sub-path's body.
+func ShippingRateCountShape(decoded any) any { return shippingrates.ShippingRateCountShape(decoded) }
+
+const (
+	ShippingRatesPath      = shippingrates.ShippingRatesPath
+	ShippingRatesCountPath = shippingrates.ShippingRatesCountPath
+	ShippingRatePath       = shippingrates.ShippingRatePath
+
+	// ShippingRatesKey wraps the listing's rows, ShippingRateKey one row and the writes, ShippingRatesCountKey the count.
+	ShippingRatesKey      = shippingrates.ShippingRatesKey
+	ShippingRateKey       = shippingrates.ShippingRateKey
+	ShippingRatesCountKey = shippingrates.ShippingRatesCountKey
+
+	// ShippingRatesPageSize is the page size when limit is not sent, ShippingRatesPageSizeCap the largest number limit takes.
+	ShippingRatesPageSize    = shippingrates.ShippingRatesPageSize
+	ShippingRatesPageSizeCap = shippingrates.ShippingRatesPageSizeCap
+
+	// ShippingRatesTransactionNoHeader is the header CreateShippingRate sends transactionNo under.
+	ShippingRatesTransactionNoHeader = shippingrates.ShippingRatesTransactionNoHeader
+)
+
+// ShippingRules is the shipping rule endpoints bound to a client.
+type ShippingRules = shippingrules.ShippingRules
+
+type (
+	// ShippingRule is one rule, a listing row, a row path's {"shipping_rule": {…}} or a write's answer.
+	ShippingRule = shippingrules.ShippingRule
+	// ShippingRulesReference is an {id, name} pair: a rule's class, rate, zone or profile.
+	ShippingRulesReference = shippingrules.ShippingReference
+	// ShippingRuleInput is the writable form for the create, the replace and the merge, wrapped in shipping_rule.
+	ShippingRuleInput = shippingrules.ShippingRuleInput
+	// ShippingRuleListing is one page of the listing: rows on ShippingRules, beside the paging.
+	ShippingRuleListing = shippingrules.ShippingRuleListing
+	// ShippingRuleCount is the count sub-path's bare {"total": N}.
+	ShippingRuleCount = shippingrules.ShippingRuleCount
+	// ShippingRulesPagination is the shipping rule listing's five-key pagination block.
+	ShippingRulesPagination = shippingrules.Pagination
+)
+
+// NewShippingRules binds the resource to a requester of your own.
+func NewShippingRules(requester Requester) *ShippingRules { return shippingrules.New(requester) }
+
+// ShippingRuleShape is the DTOShape for a body shaped {"shipping_rule": {…}}.
+func ShippingRuleShape(decoded any) any { return shippingrules.ShippingRuleShape(decoded) }
+
+// ShippingRuleListingShape is the DTOShape for the listing body.
+func ShippingRuleListingShape(decoded any) any {
+	return shippingrules.ShippingRuleListingShape(decoded)
+}
+
+// ShippingRuleCountShape is the DTOShape for the count sub-path's body.
+func ShippingRuleCountShape(decoded any) any { return shippingrules.ShippingRuleCountShape(decoded) }
+
+const (
+	ShippingRulesPath      = shippingrules.ShippingRulesPath
+	ShippingRulesCountPath = shippingrules.ShippingRulesCountPath
+	ShippingRulePath       = shippingrules.ShippingRulePath
+
+	// ShippingRulesKey wraps the listing's rows, ShippingRuleKey one row and the writes, ShippingRulesCountKey the count.
+	ShippingRulesKey      = shippingrules.ShippingRulesKey
+	ShippingRuleKey       = shippingrules.ShippingRuleKey
+	ShippingRulesCountKey = shippingrules.ShippingRulesCountKey
+
+	// ShippingRulesPageSize is the page size when limit is not sent, ShippingRulesPageSizeCap the largest number limit takes.
+	ShippingRulesPageSize    = shippingrules.ShippingRulesPageSize
+	ShippingRulesPageSizeCap = shippingrules.ShippingRulesPageSizeCap
+
+	// ShippingRulesTransactionNoHeader is the header CreateShippingRule sends transactionNo under.
+	ShippingRulesTransactionNoHeader = shippingrules.ShippingRulesTransactionNoHeader
+)
+
+// OrderPreviews is the order preview endpoints bound to a client.
+type OrderPreviews = orderpreviews.OrderPreviews
+
+type (
+	// OrderPreview is a preview session: the start's and the read's answer, and the coupon and gift card calls' shorter one.
+	OrderPreview = orderpreviews.OrderPreview
+	// PreviewSession is the session block: session_id, status and the 30-minute window.
+	PreviewSession = orderpreviews.PreviewSession
+	// PreviewCustomer is the customer as the preview shows it.
+	PreviewCustomer = orderpreviews.PreviewCustomer
+	// PreviewItem is one priced line of the preview.
+	PreviewItem = orderpreviews.PreviewItem
+	// PreviewShipping is the shipping block, with the shipping tax the totals do not carry.
+	PreviewShipping = orderpreviews.PreviewShipping
+	// PreviewDiscounts holds the applied coupon and gift card, each nil when none is applied.
+	PreviewDiscounts = orderpreviews.PreviewDiscounts
+	// PreviewCoupon is the applied coupon.
+	PreviewCoupon = orderpreviews.PreviewCoupon
+	// PreviewGiftCard is the applied gift card.
+	PreviewGiftCard = orderpreviews.PreviewGiftCard
+	// PreviewTotals are the priced totals.
+	PreviewTotals = orderpreviews.PreviewTotals
+	// OrderPreviewInput is the start body, bare; its addresses and lines are OrderAddressInput and OrderProductInput.
+	OrderPreviewInput = orderpreviews.OrderPreviewInput
+	// OrderPreviewCodeInput is the body of the coupon and the gift card call.
+	OrderPreviewCodeInput = orderpreviews.OrderPreviewCodeInput
+	// OrderPreviewConfirmInput is the confirm body, bare; the answer is a FlatOrder.
+	OrderPreviewConfirmInput = orderpreviews.OrderPreviewConfirmInput
+	// OrderPreviewPaymentInput is the payment a confirm records.
+	OrderPreviewPaymentInput = orderpreviews.OrderPreviewPaymentInput
+)
+
+// NewOrderPreviews binds the resource to a requester of your own.
+func NewOrderPreviews(requester Requester) *OrderPreviews { return orderpreviews.New(requester) }
+
+// OrderPreviewShape is the DTOShape for a body shaped {"order": {…}} in the preview shape.
+func OrderPreviewShape(decoded any) any { return orderpreviews.OrderPreviewShape(decoded) }
+
+const (
+	OrderPreviewsPath        = orderpreviews.OrderPreviewsPath
+	OrderPreviewPath         = orderpreviews.OrderPreviewPath
+	OrderPreviewConfirmPath  = orderpreviews.OrderPreviewConfirmPath
+	OrderPreviewCouponPath   = orderpreviews.OrderPreviewCouponPath
+	OrderPreviewGiftCardPath = orderpreviews.OrderPreviewGiftCardPath
+
+	// OrderPreviewKey wraps every preview answer; the request bodies are bare.
+	OrderPreviewKey = orderpreviews.OrderPreviewKey
+)
+
+// GiftCards is the gift card endpoints bound to a client.
+type GiftCards = giftcards.GiftCards
+
+type (
+	// GiftCard is one gift card, a listing row.
+	GiftCard = giftcards.GiftCard
+	// GiftCardPage is one page of the listing: rows on GiftCards, the paging block beside them.
+	GiftCardPage = giftcards.GiftCardPage
+	// GiftCardsPagination is the gift card listing's ten-key pagination block.
+	GiftCardsPagination = giftcards.Pagination
+)
+
+// NewGiftCards binds the resource to a requester of your own.
+func NewGiftCards(requester Requester) *GiftCards { return giftcards.New(requester) }
+
+// GiftCardPageShape is the DTOShape for the listing body.
+func GiftCardPageShape(decoded any) any { return giftcards.GiftCardPageShape(decoded) }
+
+const (
+	GiftCardsPath = giftcards.GiftCardsPath
+
+	// GiftCardsKey wraps the listing's rows.
+	GiftCardsKey = giftcards.GiftCardsKey
+
+	// GiftCardsPageSizeCap is the largest number limit takes.
+	GiftCardsPageSizeCap = giftcards.GiftCardsPageSizeCap
+)
+
+// Dashboards is the dashboard layout endpoints bound to a client.
+type Dashboards = dashboards.Dashboards
+
+type (
+	// DashboardPart is one part of a layout's seo section.
+	DashboardPart = dashboards.DashboardPart
+	// DashboardTab is one tab of a layout's section_tabs section.
+	DashboardTab = dashboards.DashboardTab
+	// DashboardLayoutSection is a standard or customisable section of a layout, read and written in one type.
+	DashboardLayoutSection = dashboards.DashboardSection
+	// DashboardLayoutKPI is one KPI tile of a layout, in tile order.
+	DashboardLayoutKPI = dashboards.DashboardKPI
+	// Dashboard is one layout.
+	Dashboard = dashboards.Dashboard
+	// DashboardSummary is a layout as the listing shows it.
+	DashboardSummary = dashboards.DashboardSummary
+	// DashboardListing is the listing of the admin's layouts, with no paging.
+	DashboardListing = dashboards.DashboardListing
+	// DashboardInput is the layout write body, bare.
+	DashboardInput = dashboards.DashboardInput
+)
+
+// NewDashboards binds the resource to a requester of your own.
+func NewDashboards(requester Requester) *Dashboards { return dashboards.New(requester) }
+
+// DashboardShape is the DTOShape for a bare layout body.
+func DashboardShape(decoded any) any { return dashboards.DashboardShape(decoded) }
+
+// DashboardListingShape is the DTOShape for the layout listing.
+func DashboardListingShape(decoded any) any { return dashboards.DashboardListingShape(decoded) }
+
+const (
+	DashboardsPath = dashboards.DashboardsPath
+	DashboardPath  = dashboards.DashboardPath
+)
+
+// DashboardBanners is the dashboard banner endpoints bound to a client.
+type DashboardBanners = dashboardbanners.DashboardBanners
+
+type (
+	// DashboardBannerStep is one step of an open_modal banner's walkthrough.
+	DashboardBannerStep = dashboardbanners.BannerStep
+	// DashboardBannerLearnMore is the banner's learn-more button, read and written in one type.
+	DashboardBannerLearnMore = dashboardbanners.BannerLearnMore
+	// DashboardBannerTryIt is the banner's optional second button.
+	DashboardBannerTryIt = dashboardbanners.BannerTryIt
+	// DashboardBanner is one banner.
+	DashboardBanner = dashboardbanners.DashboardBanner
+	// DashboardBannerListing is the management list of every banner.
+	DashboardBannerListing = dashboardbanners.DashboardBannerListing
+	// DashboardBannerInput is the banner write body, bare.
+	DashboardBannerInput = dashboardbanners.DashboardBannerInput
+	// DashboardBannerContact is the support card of the Dashboard.
+	DashboardBannerContact = dashboardbanners.BannerContact
+	// DashboardContentInfo is the Dashboard feed of active banners and the support card.
+	DashboardContentInfo = dashboardbanners.DashboardContentInfo
+)
+
+// NewDashboardBanners binds the resource to a requester of your own.
+func NewDashboardBanners(requester Requester) *DashboardBanners {
+	return dashboardbanners.New(requester)
+}
+
+// DashboardBannerShape is the DTOShape for a bare banner body.
+func DashboardBannerShape(decoded any) any { return dashboardbanners.DashboardBannerShape(decoded) }
+
+// DashboardBannerListingShape is the DTOShape for the banner management list.
+func DashboardBannerListingShape(decoded any) any {
+	return dashboardbanners.DashboardBannerListingShape(decoded)
+}
+
+// DashboardContentInfoShape is the DTOShape for the Dashboard feed.
+func DashboardContentInfoShape(decoded any) any {
+	return dashboardbanners.DashboardContentInfoShape(decoded)
+}
+
+const (
+	DashboardBannersPath     = dashboardbanners.DashboardBannersPath
+	DashboardBannerPath      = dashboardbanners.DashboardBannerPath
+	DashboardContentInfoPath = dashboardbanners.DashboardContentInfoPath
+)
+
+// DashboardKPIs is the dashboard KPI endpoints bound to a client.
+type DashboardKPIs = dashboardkpis.DashboardKPIs
+
+type (
+	// DashboardLayoutRef is the default layout the KPI tiles belong to.
+	DashboardLayoutRef = dashboardkpis.DashboardRef
+	// DashboardKPIPeriod is the period a KPI figure covers and the one before it.
+	DashboardKPIPeriod = dashboardkpis.KPIPeriod
+	// DashboardKPIMetric is one metric a tile can show.
+	DashboardKPIMetric = dashboardkpis.KPIMetric
+	// DashboardKPIGroup is a group of metrics.
+	DashboardKPIGroup = dashboardkpis.KPIGroup
+	// DashboardKPIOptions is every metric a tile can show, with the keys in use.
+	DashboardKPIOptions = dashboardkpis.KPIOptions
+	// DashboardKPITile is one selected tile with its figure.
+	DashboardKPITile = dashboardkpis.KPITile
+	// DashboardKPISelection is the tiles in use with their figures, as the read and the save answer.
+	DashboardKPISelection = dashboardkpis.KPISelection
+	// DashboardKPISelectionInput is the save body, bare.
+	DashboardKPISelectionInput = dashboardkpis.KPISelectionInput
+)
+
+// NewDashboardKPIs binds the resource to a requester of your own.
+func NewDashboardKPIs(requester Requester) *DashboardKPIs { return dashboardkpis.New(requester) }
+
+// DashboardKPIOptionsShape is the DTOShape for the metric options.
+func DashboardKPIOptionsShape(decoded any) any { return dashboardkpis.KPIOptionsShape(decoded) }
+
+// DashboardKPISelectionShape is the DTOShape for the tiles in use.
+func DashboardKPISelectionShape(decoded any) any { return dashboardkpis.KPISelectionShape(decoded) }
+
+const (
+	DashboardKPIOptionsPath   = dashboardkpis.DashboardKPIOptionsPath
+	DashboardKPISelectionPath = dashboardkpis.DashboardKPISelectionPath
+)
+
+// DashboardReports is the dashboard report endpoints bound to a client.
+type DashboardReports = dashboardreports.DashboardReports
+
+type (
+	// DashboardReportPeriod is the period a report covers and the one before it.
+	DashboardReportPeriod = dashboardreports.ReportPeriod
+	// DashboardReportKPI is one report figure with the previous period's.
+	DashboardReportKPI = dashboardreports.ReportKPI
+	// DashboardReportOrders is the order counts of the period.
+	DashboardReportOrders = dashboardreports.ReportOrders
+	// DashboardReportSales is the sales figures of the period.
+	DashboardReportSales = dashboardreports.ReportSales
+	// DashboardReportCustomers is the customers registered in the period.
+	DashboardReportCustomers = dashboardreports.ReportCustomers
+	// DashboardReportProducts is the products added in the period and those out of stock.
+	DashboardReportProducts = dashboardreports.ReportProducts
+	// DashboardReportPageViews is the page views of the period.
+	DashboardReportPageViews = dashboardreports.ReportPageViews
+	// DashboardReportEntity is a page, product or post by id and name.
+	DashboardReportEntity = dashboardreports.ReportEntity
+	// DashboardReportViewItem is one row of the most viewed list.
+	DashboardReportViewItem = dashboardreports.ReportViewItem
+	// DashboardReportViews is the most viewed pages or products.
+	DashboardReportViews = dashboardreports.ReportViews
+	// DashboardQuickReport is the quick report.
+	DashboardQuickReport = dashboardreports.QuickReport
+	// DashboardSalesRow is one row of the sales report.
+	DashboardSalesRow = dashboardreports.SalesRow
+	// DashboardSalesTotals is the sales report rows added up.
+	DashboardSalesTotals = dashboardreports.SalesTotals
+	// DashboardSalesReport is the sales report.
+	DashboardSalesReport = dashboardreports.SalesReport
+	// DashboardOrderCount is the orders placed in one month.
+	DashboardOrderCount = dashboardreports.OrderCount
+	// DashboardMostVisitedProduct is a product and its views.
+	DashboardMostVisitedProduct = dashboardreports.MostVisitedProduct
+	// DashboardBestSellingProduct is a product and the units sold.
+	DashboardBestSellingProduct = dashboardreports.BestSellingProduct
+	// DashboardOrderUpdates is what needs attention now.
+	DashboardOrderUpdates = dashboardreports.OrderUpdates
+	// DashboardSummaryReport is every section of the Dashboard in one answer.
+	DashboardSummaryReport = dashboardreports.SummaryReport
+)
+
+// NewDashboardReports binds the resource to a requester of your own.
+func NewDashboardReports(requester Requester) *DashboardReports {
+	return dashboardreports.New(requester)
+}
+
+// DashboardQuickReportShape is the DTOShape for the quick report.
+func DashboardQuickReportShape(decoded any) any { return dashboardreports.QuickReportShape(decoded) }
+
+// DashboardSalesReportShape is the DTOShape for the sales report.
+func DashboardSalesReportShape(decoded any) any { return dashboardreports.SalesReportShape(decoded) }
+
+// DashboardSummaryReportShape is the DTOShape for the summary.
+func DashboardSummaryReportShape(decoded any) any {
+	return dashboardreports.SummaryReportShape(decoded)
+}
+
+const (
+	DashboardReportQuickPath   = dashboardreports.DashboardReportQuickPath
+	DashboardReportSalesPath   = dashboardreports.DashboardReportSalesPath
+	DashboardReportSummaryPath = dashboardreports.DashboardReportSummaryPath
+)
+
+// DashboardSections is the dashboard section endpoints bound to a client.
+type DashboardSections = dashboardsections.DashboardSections
+
+type (
+	// DashboardSectionPeriod is the period a section covers and the one before it.
+	DashboardSectionPeriod = dashboardsections.SectionPeriod
+	// DashboardSectionEntity is a product, page or post by id and name.
+	DashboardSectionEntity = dashboardsections.SectionEntity
+	// DashboardSectionOrderUpdates is what needs attention now.
+	DashboardSectionOrderUpdates = dashboardsections.SectionOrderUpdates
+	// DashboardSectionBestSeller is a product and the units sold.
+	DashboardSectionBestSeller = dashboardsections.SectionBestSeller
+	// DashboardSectionContentUpdate is one content item to review.
+	DashboardSectionContentUpdate = dashboardsections.SectionContentUpdate
+	// DashboardSectionTopPage is a page and its views.
+	DashboardSectionTopPage = dashboardsections.SectionTopPage
+	// DashboardSectionNeedsAttention is the bookings that need attention.
+	DashboardSectionNeedsAttention = dashboardsections.SectionNeedsAttention
+	// DashboardSectionDraft is a blog draft waiting to be published.
+	DashboardSectionDraft = dashboardsections.SectionDraft
+	// DashboardSectionDrafts is the blog drafts to publish.
+	DashboardSectionDrafts = dashboardsections.SectionDrafts
+	// DashboardSectionViewedPost is a blog post and its views.
+	DashboardSectionViewedPost = dashboardsections.SectionViewedPost
+	// DashboardSectionReport is one tab of the Dashboard; only that tab's fields are set.
+	DashboardSectionReport = dashboardsections.DashboardSectionReport
+)
+
+// NewDashboardSections binds the resource to a requester of your own.
+func NewDashboardSections(requester Requester) *DashboardSections {
+	return dashboardsections.New(requester)
+}
+
+// DashboardSectionReportShape is the DTOShape for any of the five tabs.
+func DashboardSectionReportShape(decoded any) any {
+	return dashboardsections.DashboardSectionReportShape(decoded)
+}
+
+// DashboardSectionTabs returns a fresh copy of the five values {section} takes.
+func DashboardSectionTabs() []string { return dashboardsections.DashboardSectionTabs() }
+
+// DashboardSectionPath is the dashboard section path template.
+const DashboardSectionPath = dashboardsections.DashboardSectionPath

@@ -157,3 +157,13 @@ func SearchResultPageShape(decoded any) any { return dto.Read[SearchResultPage](
 
 // ProductPromotionShape is the typed view of a body shaped {"product_promotion": {…}}.
 func ProductPromotionShape(decoded any) any { return dto.Read[ProductPromotion](decoded) }
+
+// SearchReindex is the reindex's answer: Status accepted, Clean and a Message.
+type SearchReindex struct {
+	Status  *string
+	Clean   *bool
+	Message *string
+}
+
+// SearchReindexShape is the typed view of the reindex's answer.
+func SearchReindexShape(decoded any) any { return dto.Read[SearchReindex](decoded) }

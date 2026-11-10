@@ -4,6 +4,8 @@ package pagesettings
 const (
 	SearchResultPagePath = "/api/{api_version}/admin/settings/page_settings/search_result_page"
 
+	SearchReindexPath = "/api/{api_version}/admin/search/reindex"
+
 	SearchResultPageSectionPath = "/api/{api_version}/admin/settings/page_settings/search_result_page/{section}"
 
 	SearchResultPageProductPromotionsPath = "/api/{api_version}/admin/settings/page_settings/search_result_page/product_promotion"

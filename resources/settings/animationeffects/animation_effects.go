@@ -74,6 +74,73 @@ func (s *AnimationEffectsSettings) PatchAnimationEffectsSection(ctx context.Cont
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: AnimationEffectsShape})
 }
 
+// UploadAnimationEffectsCustomLoader uploads the custom preloader image — POST /admin/settings/animation_effects/custom_loader, as a part named file (svg, png, jpg, jpeg or gif; another type is 400 invalid_file, and no file 400). It answers 201 {"custom_loader": {"enabled": true, "file_name", "file_url"}}.
+func (s *AnimationEffectsSettings) UploadAnimationEffectsCustomLoader(ctx context.Context, files any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	normalised, err := normaliseFiles(files)
+	if err != nil {
+		return nil, err
+	}
+	if err := requireFiles(files, normalised); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return s.requester.SendPostRequest(ctx, AnimationEffectsCustomLoaderPath, &http.RequestOptions{
+		Files: normalised, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: CustomLoaderSectionShape})
+}
+
+// DeleteAnimationEffectsCustomLoader removes the custom preloader image — DELETE /admin/settings/animation_effects/custom_loader; 204, also when there is none, and the loader then reads enabled false with null file fields.
+func (s *AnimationEffectsSettings) DeleteAnimationEffectsCustomLoader(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return s.requester.SendDeleteRequest(ctx, AnimationEffectsCustomLoaderPath, &http.RequestOptions{
+		RaiseOnError: raiseOnError, ResponseFormat: format})
+}
+
+// normaliseFiles accepts map[string]any or [][2]any and returns the map the transport encodes.
+func normaliseFiles(files any) (map[string]any, error) {
+	switch shape := files.(type) {
+	case nil:
+		return nil, nil
+	case map[string]any:
+		return shape, nil
+	case [][2]any:
+		out := make(map[string]any, len(shape))
+		for _, pair := range shape {
+			name, ok := pair[0].(string)
+			if !ok {
+				return nil, wcerrors.NewUsageError("files: a pair's first element must be the field " +
+					"name as a string")
+			}
+			if _, clash := out[name]; clash {
+				return nil, wcerrors.NewUsageError("files: the field " + name + " appears twice; a map " +
+					"cannot carry two values under one name, so the duplicate would be lost")
+			}
+			out[name] = pair[1]
+		}
+		return out, nil
+	default:
+		return nil, wcerrors.NewUsageError("files: expected map[string]any or [][2]any " +
+			"(field, value) pairs")
+	}
+}
+
+// requireFiles refuses an upload carrying nothing — no files, or an empty container — before any I/O.
+func requireFiles(files any, normalised map[string]any) error {
+	if files == nil {
+		return wcerrors.NewUsageError("files is required")
+	}
+	if len(normalised) == 0 {
+		return wcerrors.NewUsageError(fmt.Sprintf("files must name the file to upload, got an empty %T", files))
+	}
+	return nil
+}
+
 // ResourceName is this resource's registry key — what ListResourceNames returns, snake_case.
 const ResourceName = "animation_effects"
 

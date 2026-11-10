@@ -19,11 +19,18 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/currencies"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/customergroups"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/customers"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardbanners"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardkpis"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardreports"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboards"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/dashboardsections"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/discountprofiles"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/email"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/giftcards"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/inventorylocations"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/ordercustomfields"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderflags"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderpreviews"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orders"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/pages"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/paymentgateways"
@@ -40,6 +47,9 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/settings/sitesettings"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingclasses"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingmethods"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingprofiles"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingrates"
+	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/shippingrules"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcodes"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcountrytaxes"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/taxcustomprofiles"
@@ -62,6 +72,9 @@ var (
 		customers.ResourceName: func(requester http.Requester) any { return customers.New(requester) },
 		orderflags.ResourceName: func(requester http.Requester) any {
 			return orderflags.New(requester)
+		},
+		orderpreviews.ResourceName: func(requester http.Requester) any {
+			return orderpreviews.New(requester)
 		},
 		inventorylocations.ResourceName: func(requester http.Requester) any {
 			return inventorylocations.New(requester)
@@ -110,6 +123,15 @@ var (
 		},
 		shippingmethods.ResourceName: func(requester http.Requester) any {
 			return shippingmethods.New(requester)
+		},
+		shippingprofiles.ResourceName: func(requester http.Requester) any {
+			return shippingprofiles.New(requester)
+		},
+		shippingrates.ResourceName: func(requester http.Requester) any {
+			return shippingrates.New(requester)
+		},
+		shippingrules.ResourceName: func(requester http.Requester) any {
+			return shippingrules.New(requester)
 		},
 		pagesettings.ResourceName: func(requester http.Requester) any {
 			return pagesettings.New(requester)
@@ -174,6 +196,21 @@ var (
 		taxcustomprofiles.ResourceName: func(requester http.Requester) any {
 			return taxcustomprofiles.New(requester)
 		},
+		dashboardbanners.ResourceName: func(requester http.Requester) any {
+			return dashboardbanners.New(requester)
+		},
+		dashboardkpis.ResourceName: func(requester http.Requester) any {
+			return dashboardkpis.New(requester)
+		},
+		dashboardreports.ResourceName: func(requester http.Requester) any {
+			return dashboardreports.New(requester)
+		},
+		dashboards.ResourceName: func(requester http.Requester) any {
+			return dashboards.New(requester)
+		},
+		dashboardsections.ResourceName: func(requester http.Requester) any {
+			return dashboardsections.New(requester)
+		},
 		discountprofiles.ResourceName: func(requester http.Requester) any {
 			return discountprofiles.New(requester)
 		},
@@ -191,6 +228,9 @@ var (
 		},
 		email.ResourceName: func(requester http.Requester) any {
 			return email.New(requester)
+		},
+		giftcards.ResourceName: func(requester http.Requester) any {
+			return giftcards.New(requester)
 		},
 		pages.ResourceName: func(requester http.Requester) any {
 			return pages.New(requester)

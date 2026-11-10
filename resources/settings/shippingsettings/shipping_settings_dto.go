@@ -10,27 +10,30 @@ type ProfileReference struct {
 	Name *string
 }
 
-// AreaMeta is the group_meta entry for the whole area: two fields and no href, as it has no sections.
+// AreaMeta is one group_meta entry: what the area is, whether it can be written, and its path.
 type AreaMeta struct {
 	Kind     *string
 	Writable *bool
+	Href     *string
 }
 
-// GroupMeta is the group_meta block: a single AreaMeta keyed by the area itself.
+// GroupMeta is the group_meta block: the settings area and the two collections beside it.
 type GroupMeta struct {
 	ShippingSettings *AreaMeta
+	ShippingMethods  *AreaMeta
+	ShippingClasses  *AreaMeta
 }
 
 // ShippingSettings is the area's seven flat fields under shipping_settings; ToMap renders the wrapped body, and a reference field is written by id, or cleared to null, through a mapping body instead.
 type ShippingSettings struct {
-	DefaultShippingProfile   *ProfileReference
-	EnableShippingDefaultTax *bool
-	DefaultDeliveryProfile   *ProfileReference
-	EnableDeliveryDefaultTax *bool
-	ShippingTaxProfile       *ProfileReference
-	EnableShippingClass      *bool
-	EnableFlatViewClass      *bool
-	GroupMeta                *GroupMeta
+	DefaultShippingProfile          *ProfileReference
+	ApplyStoreTaxSettingsToShipping *bool
+	DefaultDeliveryProfile          *ProfileReference
+	ApplyStoreTaxSettingsToDelivery *bool
+	ShippingTaxProfile              *ProfileReference
+	EnableShippingClass             *bool
+	EnableClassInFlatView           *bool
+	GroupMeta                       *GroupMeta
 	// FieldMetadata is the raw field_metadata block.
 	FieldMetadata any
 }

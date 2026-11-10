@@ -149,6 +149,230 @@ func (p *Products) DeleteProductStockLocation(ctx context.Context, productID any
 		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
+// CountProducts counts products — GET /admin/products/count; {"total": n, "count": n}. It takes the list's filters (search_text, name, sku, ids, parent, product_type, stock, is_available, is_inventory_enabled, created_by, price_from, price_to and the four date bounds) and refuses its paging and sorting, and status, as 400 unknown_parameter. A trashed product is not counted.
+func (p *Products) CountProducts(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendGetRequest(ctx, ProductsCountPath, &http.RequestOptions{
+		QueryParams: queryParams, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: ProductCountShape})
+}
+
+// CheckProductSku asks whether a SKU is free — GET /admin/products/check-sku. The match ignores case and sees a SKU held by a trashed product or by a variant; excludeProductID is the id of a product that may hold it, as when that product is being edited, and nil leaves it out. Any other query name, and SKU in capitals, is 400 unknown_parameter.
+func (p *Products) CheckProductSku(ctx context.Context, sku string, excludeProductID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if sku == "" {
+		return nil, wcerrors.NewUsageError("sku is required")
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	queryParams := map[string]any{"sku": sku}
+	if excludeProductID != nil {
+		queryParams["exclude_product_id"] = excludeProductID
+	}
+	return p.requester.SendGetRequest(ctx, ProductsCheckSkuPath, &http.RequestOptions{
+		QueryParams: queryParams, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: ProductSkuCheckShape})
+}
+
+// ListSpecialProducts lists a special selection of products — GET /admin/products/special. type is required: onSale, featured, new, topSelling, lastBought or lastViewed. max (1 to 100, default 10) and offset page it. The last two are per customer and need customerId (the customer_id or internal_id of a customer) or customer_email; customer_id is not read, and an unknown customer is 400 unknown_reference. A name it does not know is ignored.
+func (p *Products) ListSpecialProducts(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendGetRequest(ctx, ProductsSpecialPath, &http.RequestOptions{
+		QueryParams: queryParams, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: ProductSpecialPageShape})
+}
+
+// BulkDeleteProducts moves several products to the trash — POST /admin/products/bulk-delete, answered 200 even when an id failed. The body is {"ids": [...]} (the collection sends product_ids, which the store answers 400 required for ids); an empty list is 400. Each id that is not a product is counted in failed and listed in errors.
+func (p *Products) BulkDeleteProducts(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendPostRequest(ctx, ProductsBulkDeletePath, &http.RequestOptions{
+		JSONBody: payload, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: ProductsBulkDeleteResultShape})
+}
+
+// ListProductReviews lists a product's reviews — GET /admin/products/{product_id}/reviews; {"reviews": [...]} with no paging block. status, limit and offset are in the collection and this store ignores them, as it does any other name.
+func (p *Products) ListProductReviews(ctx context.Context, productID any, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendGetRequest(ctx, ProductReviewsPath, &http.RequestOptions{
+		PathParams:  map[string]any{"product_id": productID},
+		QueryParams: queryParams, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: ProductReviewListShape})
+}
+
+// GetProductReview reads one review under review — GET /admin/products/{product_id}/reviews/{review_id}. reviewID is a review's id; an unknown one is 404.
+func (p *Products) GetProductReview(ctx context.Context, productID any, reviewID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendGetRequest(ctx, ProductReviewPath, &http.RequestOptions{
+		PathParams:   map[string]any{"product_id": productID, "review_id": reviewID},
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductReviewShape})
+}
+
+// PatchProductReview changes one review — PATCH /admin/products/{product_id}/reviews/{review_id}, a bare body answered 200 with the review under review. status is pending (what an imported review without one reads) or approved; rejected, which the collection uses, is 400 invalid_enum. rating and comment change too.
+func (p *Products) PatchProductReview(ctx context.Context, productID any, reviewID any, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendPatchRequest(ctx, ProductReviewPath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID, "review_id": reviewID}, JSONBody: payload,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductReviewShape})
+}
+
+// DeleteProductReview deletes one review for good; 204, and a second delete is 404. DELETE /admin/products/{product_id}/reviews/{review_id}
+func (p *Products) DeleteProductReview(ctx context.Context, productID any, reviewID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendDeleteRequest(ctx, ProductReviewPath, &http.RequestOptions{
+		PathParams:   map[string]any{"product_id": productID, "review_id": reviewID},
+		RaiseOnError: raiseOnError, ResponseFormat: format})
+}
+
+// CreateProductInventory sets a product's stock figure — POST /admin/products/{product_id}/inventories, answered 201. The body is {"product": {"product_pricing_and_stock": {"track_inventory": true, "available_stock": n}}}; low_level_stock sets the low level. It records a history row and a variant keeps its own figure. The header is stored as the product's transaction_no when it has none, and the answer echoes the value from before the write.
+func (p *Products) CreateProductInventory(ctx context.Context, productID any, payload any, transactionNo string, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	var headers map[string]string
+	if transactionNo != "" {
+		headers = map[string]string{ProductsTransactionNoHeader: transactionNo}
+	}
+	return p.requester.SendPostRequest(ctx, ProductInventoriesPath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID}, JSONBody: payload,
+		Headers: headers, RaiseOnError: raiseOnError,
+		ResponseFormat: format, DTOShape: ProductInventoryResultShape})
+}
+
+// CreateProductImage stores images on a product — POST /admin/products/{product_id}/image, answered 201 with the files just stored. The body is JSON, {"product": {"image_and_video": {"images": [{"filename": ..., "base64": ...}]}}}; a multipart body is 415.
+func (p *Products) CreateProductImage(ctx context.Context, productID any, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendPostRequest(ctx, ProductImagePath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID}, JSONBody: payload,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductMediaUploadedShape})
+}
+
+// CreateProductMedia stores one file on a product — POST /admin/products/{product_id}/media, answered 201 with the stored image's row, flat, not under product. A bare JSON body of type, filename and content (base64 or a data: URI). Only type images is accepted; videos and specification_file are 400 not_supported, and position is 400 unknown_field.
+func (p *Products) CreateProductMedia(ctx context.Context, productID any, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendPostRequest(ctx, ProductMediaPath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID}, JSONBody: payload,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductMediaImageShape})
+}
+
+// DeleteProductMediaImage deletes one image from a product; 204, and a second delete is 404. imageID is an image's id on the product. DELETE /admin/products/{product_id}/media/images/{image_id}
+func (p *Products) DeleteProductMediaImage(ctx context.Context, productID any, imageID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendDeleteRequest(ctx, ProductMediaImagePath, &http.RequestOptions{
+		PathParams:   map[string]any{"product_id": productID, "image_id": imageID},
+		RaiseOnError: raiseOnError, ResponseFormat: format})
+}
+
+// UpdateProductMediaOrder sets the order of a product's images — PUT /admin/products/{product_id}/media/order, a bare {"type": "images", "ids": [...]} naming every image once (400 invalid_set otherwise). The first id becomes primary, and the answer is {"images": [...]} in the new order.
+func (p *Products) UpdateProductMediaOrder(ctx context.Context, productID any, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendPutRequest(ctx, ProductMediaOrderPath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID}, JSONBody: payload,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductMediaOrderShape})
+}
+
+// PatchProductMediaImage moves one image to a 1-based position — PATCH /admin/products/{product_id}/media/images/{image_id}; a bare {"position": n} is the only body (any other is 400 invalid_body), and the image is answered as one flat row. imageID is an image's id on the product.
+func (p *Products) PatchProductMediaImage(ctx context.Context, productID any, imageID any, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendPatchRequest(ctx, ProductMediaImagePath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID, "image_id": imageID}, JSONBody: payload,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductMediaImageShape})
+}
+
+// GetProductSeo reads a product's SEO, analytics, custom code, social and AI visibility settings under seo — GET /admin/products/{product_id}/seo. It has no HEAD (404) and ignores field_metadata.
+func (p *Products) GetProductSeo(ctx context.Context, productID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendGetRequest(ctx, ProductSeoPath, &http.RequestOptions{
+		PathParams:   map[string]any{"product_id": productID},
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductSeoShape})
+}
+
+// PatchProductStock changes a product's stock — PATCH /admin/products/{product_id}/stock; a bare body of tracking, locations, note and transaction_no, at least one of them (a wrapper or a flat available_stock is 400 unknown_field). The answer holds the stock now and the adjustment it recorded, null when the figure did not change.
+func (p *Products) PatchProductStock(ctx context.Context, productID any, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	if err := requirePayload(payload); err != nil {
+		return nil, err
+	}
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendPatchRequest(ctx, ProductStockPath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID}, JSONBody: payload,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductStockPatchResultShape})
+}
+
+// ListProductStockAdjustments lists a product's stock history, newest first — GET /admin/products/{product_id}/stock/adjustments, paged by limit (default 20) and offset. Each row reads transaction_no null, also for a change sent with one; HEAD is 404.
+func (p *Products) ListProductStockAdjustments(ctx context.Context, productID any, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+	format, err := oneResponseFormat(responseFormat)
+	if err != nil {
+		return nil, err
+	}
+	return p.requester.SendGetRequest(ctx, ProductStockAdjustmentsPath, &http.RequestOptions{
+		PathParams: map[string]any{"product_id": productID}, QueryParams: queryParams,
+		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: ProductStockAdjustmentPageShape})
+}
+
 // ResourceName is this resource's registry key — what ListResourceNames returns, snake_case.
 const ResourceName = "products"
 

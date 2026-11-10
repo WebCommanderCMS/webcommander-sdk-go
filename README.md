@@ -206,14 +206,14 @@ errors.
 
 ## Resources
 
-The client exposes 46 resources with 349 operations. The [API reference](https://newlify.mintlify.app)
+The client exposes 56 resources with 436 operations. The [API reference](https://newlify.mintlify.app)
 lists the method, path and behaviour of each one.
 
 | Resource | Client accessor | Operations |
 |---|---|---:|
 | Customers | `client.AdminCustomers()` | 15 |
 | Aliases | `client.Aliases()` | 4 |
-| Animation effects settings | `client.AnimationEffectsSettings()` | 5 |
+| Animation effects settings | `client.AnimationEffectsSettings()` | 7 |
 | Blog categories | `client.BlogCategories()` | 5 |
 | Blogs | `client.Blogs()` | 12 |
 | Carts | `client.Carts()` | 7 |
@@ -226,24 +226,34 @@ lists the method, path and behaviour of each one.
 | Currencies | `client.Currencies()` | 11 |
 | Customer groups | `client.CustomerGroups()` | 9 |
 | Customer portal settings | `client.CustomerPortalSettings()` | 5 |
+| Dashboard banners | `client.DashboardBanners()` | 6 |
+| Dashboard KPIs | `client.DashboardKPIs()` | 3 |
+| Dashboard reports | `client.DashboardReports()` | 6 |
+| Dashboard sections | `client.DashboardSections()` | 1 |
+| Dashboards | `client.Dashboards()` | 5 |
 | Discount profiles | `client.DiscountProfiles()` | 7 |
 | Ecommerce settings | `client.EcommerceSettings()` | 5 |
 | Email | `client.Email()` | 1 |
+| Gift cards | `client.GiftCards()` | 1 |
 | Inventory locations | `client.InventoryLocations()` | 11 |
 | Order custom fields | `client.OrderCustomFields()` | 4 |
 | Order flags | `client.OrderFlags()` | 7 |
+| Order previews | `client.OrderPreviews()` | 7 |
 | Orders | `client.Orders()` | 25 |
 | Pages | `client.Pages()` | 15 |
 | Payment gateways | `client.PaymentGateways()` | 8 |
 | Price display settings | `client.PriceDisplaySettings()` | 5 |
 | Product listing settings | `client.ProductListingSettings()` | 3 |
 | Product page settings | `client.ProductPageSettings()` | 5 |
-| Products | `client.Products()` | 10 |
-| Search result page settings | `client.SearchResultPageSettings()` | 13 |
+| Products | `client.Products()` | 27 |
+| Search result page settings | `client.SearchResultPageSettings()` | 14 |
 | Search settings | `client.SearchSettings()` | 9 |
 | SEO configuration | `client.SeoConfigurationSettings()` | 18 |
 | Shipping classes | `client.ShippingClasses()` | 9 |
 | Shipping methods | `client.ShippingMethods()` | 9 |
+| Shipping profiles | `client.ShippingProfiles()` | 11 |
+| Shipping rates | `client.ShippingRates()` | 10 |
+| Shipping rules | `client.ShippingRules()` | 10 |
 | Shipping settings | `client.ShippingSettings()` | 3 |
 | Shopping cart settings | `client.ShoppingCartSettings()` | 5 |
 | Site settings | `client.SiteSettings()` | 5 |
@@ -252,11 +262,11 @@ lists the method, path and behaviour of each one.
 | Tax custom profiles | `client.TaxCustomProfiles()` | 5 |
 | Tax profiles | `client.TaxProfiles()` | 7 |
 | Tax rules | `client.TaxRules()` | 7 |
-| Tax settings | `client.TaxSettings()` | 2 |
+| Tax settings | `client.TaxSettings()` | 4 |
 | Tax zones | `client.TaxZones()` | 7 |
 | Transactions | `client.Transactions()` | 6 |
-| Trash | `client.Trash()` | 8 |
-| Variations | `client.Variations()` | 12 |
+| Trash | `client.Trash()` | 9 |
+| Variations | `client.Variations()` | 16 |
 
 Each resource lives in its own package under `resources/` with its typed views and path
 constants; the root package re-exports them. `client.ListResourceNames()` returns the registry

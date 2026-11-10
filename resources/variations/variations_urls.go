@@ -10,6 +10,8 @@ const (
 
 	ProductVariationsPath = "/api/{api_version}/admin/products/{product_id}/variations"
 
+	ProductVariationPath = "/api/{api_version}/admin/products/{product_id}/variations/{variation_id}"
+
 	ProductVariationsBulkPath = "/api/{api_version}/admin/products/{product_id}/variations/bulk"
 )
 

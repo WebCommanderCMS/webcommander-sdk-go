@@ -128,3 +128,11 @@ func (a AnimationEffects) ToMap() map[string]any { return dto.ToMap(a) }
 
 // AnimationEffectsShape is the typed view of the facade's body and of one section's.
 func AnimationEffectsShape(decoded any) any { return dto.Read[AnimationEffects](decoded) }
+
+// CustomLoaderSection is the custom_loader section: the uploaded preloader image, or Enabled false.
+type CustomLoaderSection struct {
+	CustomLoader *CustomLoader
+}
+
+// CustomLoaderSectionShape is the typed view of the upload's answer, {"custom_loader": {…}}.
+func CustomLoaderSectionShape(decoded any) any { return dto.Read[CustomLoaderSection](decoded) }
