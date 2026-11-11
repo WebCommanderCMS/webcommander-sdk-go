@@ -313,8 +313,8 @@ func NewTokenProvider(sdkConfig SdkConfig, transport *HTTPTransport, store Token
 	return auth.NewTokenProvider(sdkConfig, transport, store)
 }
 
-func BuildCredentialsNamespace(baseURL, clientID, clientSecret, authString, grantType string) string {
-	return auth.BuildCredentialsNamespace(baseURL, clientID, clientSecret, authString, grantType)
+func BuildCredentialsNamespace(baseURL, clientID, clientSecret, authString, grantType, authBaseURL string) string {
+	return auth.BuildCredentialsNamespace(baseURL, clientID, clientSecret, authString, grantType, authBaseURL)
 }
 
 // BuildTokenPath is the token endpoint path for an API version ("/api/v4/oauth2/token").

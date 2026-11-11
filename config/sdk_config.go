@@ -21,7 +21,7 @@ import (
 )
 
 // fallbackVersion is reported when the build carries no module version. Bump it on every release.
-const fallbackVersion = "4.0.1"
+const fallbackVersion = "4.0.2"
 
 var sdkVersion = readModuleVersion()
 
@@ -620,6 +620,8 @@ func authFieldNames() map[string]bool {
 
 func absentRequiredAuthFields(supplied map[string]any) []string {
 	authType := reflect.TypeFor[AuthConfig]()
+	hykmahOrigin, _ := supplied[dto.WireName("AuthBaseURL")].(string)
+	usesHykmah := strings.TrimSpace(hykmahOrigin) != ""
 	var absent []string
 	for index := 0; index < authType.NumField(); index++ {
 		field := authType.Field(index)
@@ -627,6 +629,9 @@ func absentRequiredAuthFields(supplied map[string]any) []string {
 			continue
 		}
 		name := dto.WireName(field.Name)
+		if usesHykmah && (field.Name == "RedirectURI" || field.Name == "AuthString") {
+			continue
+		}
 		if _, found := supplied[name]; !found {
 			absent = append(absent, name)
 		}

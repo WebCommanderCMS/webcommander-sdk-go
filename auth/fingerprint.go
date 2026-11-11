@@ -8,10 +8,10 @@ import (
 	"unicode/utf8"
 )
 
-// BuildCredentialsNamespace is the fixed 16-hex namespace these five credential values key the token cache under.
-func BuildCredentialsNamespace(baseURL, clientID, clientSecret, authString, grantType string) string {
+// BuildCredentialsNamespace is the fixed 16-hex namespace these credential values key the token cache under.
+func BuildCredentialsNamespace(baseURL, clientID, clientSecret, authString, grantType, authBaseURL string) string {
 	var b strings.Builder
-	for _, value := range []string{"v3", baseURL, clientID, clientSecret, authString, grantType} {
+	for _, value := range []string{"v4", baseURL, clientID, clientSecret, authString, grantType, authBaseURL} {
 		b.WriteString(strconv.Itoa(utf8.RuneCountInString(value)))
 		b.WriteByte(':')
 		b.WriteString(value)

@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"maps"
 	"math"
 	"strconv"
 	"strings"
@@ -23,6 +24,9 @@ type TokenProvider struct {
 
 const refreshGrantType = "refresh_token"
 
+// HykmahTokenPath is the token endpoint path on the Hykmah origin set as AuthConfig.AuthBaseURL.
+const HykmahTokenPath = "/api/v1/oauth/token" //#nosec G101 -- the token endpoint path, not a token
+
 // TokenPathTemplate is the token endpoint path with its version slot unfilled; BuildTokenPath fills it.
 const TokenPathTemplate = "/api/{api_version}/oauth2/token" //#nosec G101 -- the token endpoint path, not a token
 
@@ -37,12 +41,24 @@ func NewTokenProvider(config wccfg.SdkConfig, transport *http.HTTPTransport, sto
 		config:    config,
 		transport: transport,
 		store:     store,
-		tokenPath: BuildTokenPath(config.APIVersion),
+		tokenPath: tokenPathFor(config),
 	}
 }
 
-// TokenURL is the absolute token endpoint URL.
-func (p *TokenProvider) TokenURL() string { return p.config.Auth.BaseURL + p.tokenPath }
+func tokenPathFor(config wccfg.SdkConfig) string {
+	if config.Auth.UsesHykmah() {
+		return HykmahTokenPath
+	}
+	return BuildTokenPath(config.APIVersion)
+}
+
+// TokenURL is the absolute token endpoint URL: on the Hykmah origin when AuthBaseURL is set, else on the store.
+func (p *TokenProvider) TokenURL() string {
+	if p.config.Auth.UsesHykmah() {
+		return p.config.Auth.AuthBaseURL + p.tokenPath
+	}
+	return p.config.Auth.BaseURL + p.tokenPath
+}
 
 // GetAccessToken returns a usable token, fetching one only when the cached one is missing or expiring.
 func (p *TokenProvider) GetAccessToken(ctx context.Context) (string, error) {
@@ -116,18 +132,19 @@ func (p *TokenProvider) renew(ctx context.Context, staleAccessToken string, anyC
 }
 
 func (p *TokenProvider) requestTokenWithCredentials(ctx context.Context) (*TokenRecord, error) {
-	response, err := p.transport.SendHTTPRequest(ctx, http.TransportRequest{
-		HTTPMethod: "POST", URL: p.TokenURL(), EndpointTemplate: TokenPathTemplate,
-		JSONBody: p.credentialsPayload(), Headers: p.tokenHeaders(),
-	})
+	response, err := p.sendTokenRequest(ctx, p.credentialsGrant())
 	if err != nil {
 		return nil, err
 	}
 	if !response.Succeeded() {
 		messages := response.GetErrorMessages()
+		failure := fmt.Sprintf("token request failed with %d (%d reported)", response.StatusCode, len(messages))
+		if p.config.Auth.UsesHykmah() {
+			failure += "; check clientId, clientSecret, grantType and authBaseUrl"
+		}
 		// The status and count, not the endpoint's server-controlled words, which Error() would render.
 		return nil, wcerrors.NewAuthResponseError(
-			fmt.Sprintf("token request failed with %d (%d reported)", response.StatusCode, len(messages)),
+			failure,
 			response.StatusCode, response.ErrorType, redact.RedactValue(response.Map()),
 			redact.RedactMapping(response.Headers), response.RequestInfo, messages)
 	}
@@ -136,16 +153,9 @@ func (p *TokenProvider) requestTokenWithCredentials(ctx context.Context) (*Token
 
 // requestTokenWithRefreshGrant is the cheap grant; any failure falls back to full credentials.
 func (p *TokenProvider) requestTokenWithRefreshGrant(ctx context.Context, refreshToken string) *TokenRecord {
-	payload := map[string]any{
+	response, err := p.sendTokenRequest(ctx, map[string]any{
 		"grant_type":    refreshGrantType,
 		"refresh_token": refreshToken,
-		"redirect_uri":  p.config.Auth.RedirectURI,
-		"client_id":     p.config.Auth.ClientID,
-		"client_secret": p.config.Auth.ClientSecret,
-	}
-	response, err := p.transport.SendHTTPRequest(ctx, http.TransportRequest{
-		HTTPMethod: "POST", URL: p.TokenURL(), EndpointTemplate: TokenPathTemplate,
-		JSONBody: payload, Headers: p.tokenHeaders(),
 	})
 	if err != nil || !response.Succeeded() {
 		return nil
@@ -157,21 +167,48 @@ func (p *TokenProvider) requestTokenWithRefreshGrant(ctx context.Context, refres
 	return tokenRecord
 }
 
-func (p *TokenProvider) credentialsPayload() map[string]any {
+// credentialsGrant is the grant fields of the full credentials request: the store also takes the auth string.
+func (p *TokenProvider) credentialsGrant() map[string]any {
+	if p.config.Auth.UsesHykmah() {
+		return map[string]any{"grant_type": p.config.Auth.GrantType}
+	}
 	return map[string]any{
-		"grant_type":    p.config.Auth.GrantType,
-		"auth_string":   p.config.Auth.AuthString,
+		"grant_type":  p.config.Auth.GrantType,
+		"auth_string": p.config.Auth.AuthString,
+	}
+}
+
+// sendTokenRequest posts one grant: a form to Hykmah, which refuses JSON, or JSON with the redirect URI to the store.
+func (p *TokenProvider) sendTokenRequest(ctx context.Context, grant map[string]any) (*http.ApiResponse, error) {
+	if p.config.Auth.UsesHykmah() {
+		form := map[string]any{
+			"client_id":     p.config.Auth.ClientID,
+			"client_secret": p.config.Auth.ClientSecret,
+		}
+		maps.Copy(form, grant)
+		return p.transport.SendHTTPRequest(ctx, http.TransportRequest{
+			HTTPMethod: "POST", URL: p.TokenURL(), EndpointTemplate: HykmahTokenPath,
+			FormData: form, Headers: p.tokenHeaders(),
+		})
+	}
+	payload := map[string]any{
 		"redirect_uri":  p.config.Auth.RedirectURI,
 		"client_id":     p.config.Auth.ClientID,
 		"client_secret": p.config.Auth.ClientSecret,
 	}
+	maps.Copy(payload, grant)
+	headers := p.tokenHeaders()
+	headers["Content-Type"] = "application/json"
+	return p.transport.SendHTTPRequest(ctx, http.TransportRequest{
+		HTTPMethod: "POST", URL: p.TokenURL(), EndpointTemplate: TokenPathTemplate,
+		JSONBody: payload, Headers: headers,
+	})
 }
 
 func (p *TokenProvider) tokenHeaders() map[string]string {
 	return map[string]string{
-		"Content-Type": "application/json",
-		"Accept":       "application/json",
-		"User-Agent":   p.config.UserAgent,
+		"Accept":     "application/json",
+		"User-Agent": p.config.UserAgent,
 	}
 }
 

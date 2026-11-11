@@ -8,7 +8,7 @@ import (
 func BuildDefaultTokenStore(config wccfg.SdkConfig) (TokenStore, error) {
 	credentials := config.Auth.Normalised()
 	namespace := BuildCredentialsNamespace(credentials.BaseURL, credentials.ClientID, credentials.ClientSecret,
-		credentials.AuthString, credentials.GrantType)
+		credentials.AuthString, credentials.GrantType, credentials.AuthBaseURL)
 	switch credentials.TokenCacheMode {
 	case wccfg.TokenCacheMemoryOnly:
 		return NewMemoryTokenStore(), nil

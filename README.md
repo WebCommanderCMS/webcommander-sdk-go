@@ -75,6 +75,24 @@ func main() {
 - The SDK never reads credentials from the environment or from `.env`. The example reads them in
   your code.
 
+### Hykmah sign-in
+
+A store whose API client was issued through Hykmah gets its token from Hykmah instead of from the
+store. Set the Hykmah address as `AuthBaseURL`; `RedirectURI` and `AuthString` are not needed:
+
+```go
+auth := wc.AuthConfig{
+	ClientName:   "default",
+	BaseURL:      os.Getenv("WC_BASE_URL"),
+	ClientID:     os.Getenv("WC_CLIENT_ID"),
+	ClientSecret: os.Getenv("WC_CLIENT_SECRET"),
+	AuthBaseURL:  os.Getenv("WC_AUTH_BASE_URL"),
+}
+```
+
+Only the token request goes to `AuthBaseURL`. Every API call still goes to `BaseURL`. Leave
+`AuthBaseURL` blank to get the token from the store with `RedirectURI` and `AuthString`.
+
 ## Configuration
 
 `AuthConfig` holds the credentials; the rest of `SdkConfig` is behaviour, and every behaviour field

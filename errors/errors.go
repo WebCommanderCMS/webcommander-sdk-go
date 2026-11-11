@@ -381,7 +381,7 @@ var hintsByStatus = map[int]string{
 	400: "the API rejected the request itself - check the payload shape and the " +
 		"query parameter names against the endpoint documentation",
 	401: "credentials were rejected, or the token expired and could not be renewed " +
-		"- check clientId, clientSecret and authString",
+		"- check clientId, clientSecret and authString, or authBaseUrl for a Hykmah client",
 	403: "authenticated, but this client is not allowed to do that",
 	404: "no such record - check the id you passed actually exists",
 	405: "wrong HTTP method for this path",

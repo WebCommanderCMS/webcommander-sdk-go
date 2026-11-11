@@ -54,9 +54,9 @@ type AuthConfig struct {
 	ClientID string `wc:"required"`
 	// ClientSecret is the OAuth client secret; redacted by String.
 	ClientSecret string `wc:"required"`
-	// RedirectURI is the registered redirect URI.
+	// RedirectURI is the registered redirect URI; required by the store token endpoint, unused when AuthBaseURL is set.
 	RedirectURI string `wc:"required"`
-	// AuthString is the base64 admin credential; redacted by String.
+	// AuthString is the base64 admin credential; redacted by String. Required without AuthBaseURL.
 	AuthString string `wc:"required"`
 	// ClientName labels this instance in logs and selects it by name.
 	ClientName string `wc:"required"`
@@ -66,7 +66,12 @@ type AuthConfig struct {
 	TokenCacheMode TokenCacheMode
 	// TokenCachePath is the explicit cache file; naming it promotes the mode to explicit path.
 	TokenCachePath string
+	// AuthBaseURL is the Hykmah origin that issues the token; blank asks the store at BaseURL.
+	AuthBaseURL string
 }
+
+// UsesHykmah reports whether the token comes from Hykmah rather than from the store itself.
+func (c AuthConfig) UsesHykmah() bool { return c.AuthBaseURL != "" }
 
 // A known grant type is a protocol constant and prints as itself; anything else is only described.
 var knownGrantTypes = map[string]bool{"client_credentials": true, "refresh_token": true}
@@ -79,16 +84,18 @@ func (c AuthConfig) String() string {
 	}
 	return fmt.Sprintf(
 		"AuthConfig(baseUrl=%s, clientId=%s, clientSecret=%q, redirectUri=%s, authString=%q, "+
-			"clientName=%q, grantType=%s, tokenCacheMode=%s, tokenCachePath=%s)",
+			"clientName=%q, grantType=%s, tokenCacheMode=%s, tokenCachePath=%s, authBaseUrl=%s)",
 		redact.Describe(c.BaseURL), redact.Describe(c.ClientID), redact.Redacted,
 		redact.Describe(c.RedirectURI), redact.Redacted, redact.RedactValue(c.ClientName),
-		grantType, c.TokenCacheMode, redact.DescribePath(c.TokenCachePath))
+		grantType, c.TokenCacheMode, redact.DescribePath(c.TokenCachePath),
+		redact.Describe(c.AuthBaseURL))
 }
 
 // Normalised returns a copy with defaults applied and the base URL and cache mode resolved.
 func (c AuthConfig) Normalised() AuthConfig {
 	out := c
 	out.BaseURL = strings.TrimRight(strings.TrimSpace(c.BaseURL), "/")
+	out.AuthBaseURL = strings.TrimRight(strings.TrimSpace(c.AuthBaseURL), "/")
 	// ClientName is left blank so Validate reports it, rather than colliding with "default".
 	if out.GrantType == "" {
 		out.GrantType = DefaultGrantType
@@ -108,13 +115,17 @@ func (c AuthConfig) Validate() error {
 	var details []string
 
 	var missing []string
-	for _, required := range []struct{ name, value string }{
+	required := []struct{ name, value string }{
 		{"baseUrl", c.BaseURL},
 		{"clientId", c.ClientID},
 		{"clientSecret", c.ClientSecret},
-		{"redirectUri", c.RedirectURI},
-		{"authString", c.AuthString},
-	} {
+	}
+	if !c.UsesHykmah() {
+		required = append(required,
+			struct{ name, value string }{"redirectUri", c.RedirectURI},
+			struct{ name, value string }{"authString", c.AuthString})
+	}
+	for _, required := range required {
 		if isBlank(required.value) {
 			missing = append(missing, required.name)
 		}
@@ -123,9 +134,15 @@ func (c AuthConfig) Validate() error {
 		problems = append(problems, "missing required values: "+strings.Join(missing, ", "))
 	}
 	if !isBlank(c.BaseURL) {
-		if found := baseURLProblems(c.BaseURL); len(found) > 0 {
+		if found := baseURLProblems("baseUrl", c.BaseURL); len(found) > 0 {
 			problems = append(problems, found...)
 			details = append(details, "baseUrl: "+redact.RedactText(c.BaseURL))
+		}
+	}
+	if c.UsesHykmah() {
+		if found := baseURLProblems("authBaseUrl", c.AuthBaseURL); len(found) > 0 {
+			problems = append(problems, found...)
+			details = append(details, "authBaseUrl: "+redact.RedactText(c.AuthBaseURL))
 		}
 	}
 	if isBlank(c.ClientName) {
@@ -176,7 +193,7 @@ func (c AuthConfig) WithOverrides(changes map[string]any) (AuthConfig, error) {
 	return out, nil
 }
 
-func baseURLProblems(baseURL string) []string {
+func baseURLProblems(name, baseURL string) []string {
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		// Unwrapped: *url.Error prepends the whole input, and an unparseable base URL may carry userinfo.
@@ -184,22 +201,22 @@ func baseURLProblems(baseURL string) []string {
 		if errors.As(err, &parseErr) {
 			err = parseErr.Err
 		}
-		return []string{fmt.Sprintf("baseUrl: is not a URL (%v)", err)}
+		return []string{fmt.Sprintf("%s: is not a URL (%v)", name, err)}
 	}
 	if u.Scheme == "" {
-		return []string{"baseUrl: has no scheme — must start with http:// or https://"}
+		return []string{name + ": has no scheme — must start with http:// or https://"}
 	}
 	// The refusals below name which part is wrong without echoing the value, which may carry userinfo.
 	scheme := strings.ToLower(u.Scheme)
 	if (scheme != "http" && scheme != "https") || u.Hostname() == "" {
 		return []string{fmt.Sprintf(
-			"baseUrl: must start with http:// or https:// and include a host, got %s",
-			redact.Describe(baseURL))}
+			"%s: must start with http:// or https:// and include a host, got %s",
+			name, redact.Describe(baseURL))}
 	}
 	var problems []string
 	if u.User != nil {
 		problems = append(problems,
-			"baseUrl: the host carries embedded credentials, which would replace the bearer token; "+
+			name+": the host carries embedded credentials, which would replace the bearer token; "+
 				"strip the userinfo")
 	}
 	// A ';' path-parameter run is not refused: it is a path, not a pasted query or fragment.
@@ -212,7 +229,7 @@ func baseURLProblems(baseURL string) []string {
 			which = "a query string and a fragment"
 		}
 		problems = append(problems, fmt.Sprintf(
-			"baseUrl: must be the instance origin only, and this one carries %s", which))
+			"%s: must be the origin only, and this one carries %s", name, which))
 	}
 	return problems
 }
