@@ -178,7 +178,7 @@ func (p *Products) CheckProductSku(ctx context.Context, sku string, excludeProdu
 		ResponseFormat: format, DTOShape: ProductSkuCheckShape})
 }
 
-// ListSpecialProducts lists a special selection of products — GET /admin/products/special. type is required: onSale, featured, new, topSelling, lastBought or lastViewed. max (1 to 100, default 10) and offset page it. The last two are per customer and need customerId (the customer_id or internal_id of a customer) or customer_email; customer_id is not read, and an unknown customer is 400 unknown_reference. A name it does not know is ignored.
+// ListSpecialProducts lists a special selection of products — GET /admin/products/special. type is required: onSale, featured, new, topSelling, lastBought or lastViewed. max (1 to 100, default 10) and offset page it. The last two are per customer and need customerId (a customer's customer_id) or customer_email; customer_id is not read, and an unknown customer is 400 unknown_reference. A name it does not know is ignored.
 func (p *Products) ListSpecialProducts(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {

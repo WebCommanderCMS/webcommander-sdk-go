@@ -17,7 +17,7 @@ type OrderCustomer struct {
 	LastName      *string
 	CustomerGroup *string
 	Gender        *string
-	// CustomerID is the public id; InternalID is the one the listing's customerId filter takes.
+	// Paths and filters take CustomerID; InternalID is for reference.
 	CustomerID   *int64
 	InternalID   *int64
 	Email        *string
@@ -297,9 +297,10 @@ type OrderCommentList struct {
 	Comments []*OrderComment
 }
 
-// OrderCustomFields is an order's custom field values; OrderID echoes the internal_id asked for, and a delivery order adds DeliveryCost.
+// OrderCustomFields is an order's custom field values; a delivery order adds DeliveryCost.
 type OrderCustomFields struct {
 	OrderID      *int64
+	InternalID   *int64
 	CustomFields []any
 	DeliveryCost *float64
 }
@@ -357,7 +358,7 @@ type OrderRefundRecordLine struct {
 	LineFullyRefunded *bool
 }
 
-// OrderRefundRecord is one refund an order holds. OrderID is the order's internal id. A payment refund fills RecordOnly to Lines; an order refund leaves them nil and Lines empty. GatewayChargeID, GatewayRefundID and FailureCause were null on every refund read, so they are untyped.
+// OrderRefundRecord is one refund an order holds. A payment refund fills RecordOnly to Lines; an order refund leaves them nil and Lines empty. GatewayChargeID, GatewayRefundID and FailureCause were null on every refund read, so they are untyped.
 type OrderRefundRecord struct {
 	Gateway            *string
 	GatewayChargeID    any
@@ -382,21 +383,22 @@ type OrderRefundRecord struct {
 	UpdatedAt          *string
 }
 
-// OrderRefundPage is one page of an order's refunds, newest first. OrderID is the order's internal id and OrderNo the {order_id} the path took.
+// OrderRefundPage is one page of an order's refunds, newest first; OrderNo equals OrderID.
 type OrderRefundPage struct {
 	OrderID    *int64
+	InternalID *int64
 	OrderNo    *int64
 	Refunds    []*OrderRefundRecord
 	Pagination *Pagination
 }
 
-// PaymentRefund is what a payment refund answers; a replay drops four flags and adds IdempotentReplay.
+// PaymentRefund is what a payment refund answers; OrderNo equals OrderID. A replay drops four flags and adds IdempotentReplay.
 type PaymentRefund struct {
-	Status    *string
-	RefundID  *int64
-	PaymentID *int64
-	// OrderID holds the order's internal id and OrderNo its order_id.
+	Status               *string
+	RefundID             *int64
+	PaymentID            *int64
 	OrderID              *int64
+	InternalID           *int64
 	OrderNo              *int64
 	Currency             *string
 	Amount               *float64

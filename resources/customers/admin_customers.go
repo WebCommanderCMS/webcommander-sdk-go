@@ -26,7 +26,7 @@ func (a *AdminCustomers) GetCustomers(ctx context.Context, queryParams map[strin
 		ResponseFormat: format, DTOShape: PageOf[Customer]})
 }
 
-// GetCustomer fetches one customer by id — GET /admin/customers/{customer_id}; the slot takes customer_id, not internal_id.
+// GetCustomer fetches one customer by id — GET /admin/customers/{customer_id}.
 func (a *AdminCustomers) GetCustomer(ctx context.Context, customerID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {

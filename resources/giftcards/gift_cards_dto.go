@@ -4,7 +4,7 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/dto"
 )
 
-// GiftCard is one gift card. Code is what an order preview's gift-card call takes; a card can be applied only while IsActive and IsPaid, with a Balance above zero, before its AvailableTo date and with Email equal to the previewed customer's email.
+// GiftCard is one gift card. Code is what ApplyCheckoutGiftCard takes; a card can be applied only while IsActive and IsPaid, with a Balance above zero, before its AvailableTo date and with Email equal to the cart customer's email.
 type GiftCard struct {
 	ID                *int64
 	Code              *string

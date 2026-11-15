@@ -224,12 +224,13 @@ errors.
 
 ## Resources
 
-The client exposes 56 resources with 436 operations. The [API reference](https://newlify.mintlify.app)
+The client exposes 56 resources with 435 operations. The [API reference](https://newlify.mintlify.app)
 lists the method, path and behaviour of each one.
 
 | Resource | Client accessor | Operations |
 |---|---|---:|
 | Customers | `client.AdminCustomers()` | 15 |
+| Admin carts | `client.AdminCarts()` | 19 |
 | Aliases | `client.Aliases()` | 4 |
 | Animation effects settings | `client.AnimationEffectsSettings()` | 7 |
 | Blog categories | `client.BlogCategories()` | 5 |
@@ -253,10 +254,9 @@ lists the method, path and behaviour of each one.
 | Ecommerce settings | `client.EcommerceSettings()` | 5 |
 | Email | `client.Email()` | 1 |
 | Gift cards | `client.GiftCards()` | 1 |
-| Inventory locations | `client.InventoryLocations()` | 11 |
+| Inventory locations | `client.InventoryLocations()` | 9 |
 | Order custom fields | `client.OrderCustomFields()` | 4 |
-| Order flags | `client.OrderFlags()` | 7 |
-| Order previews | `client.OrderPreviews()` | 7 |
+| Order flags | `client.OrderFlags()` | 5 |
 | Orders | `client.Orders()` | 25 |
 | Pages | `client.Pages()` | 15 |
 | Payment gateways | `client.PaymentGateways()` | 8 |
@@ -267,21 +267,21 @@ lists the method, path and behaviour of each one.
 | Search result page settings | `client.SearchResultPageSettings()` | 14 |
 | Search settings | `client.SearchSettings()` | 9 |
 | SEO configuration | `client.SeoConfigurationSettings()` | 18 |
-| Shipping classes | `client.ShippingClasses()` | 9 |
-| Shipping methods | `client.ShippingMethods()` | 9 |
+| Shipping classes | `client.ShippingClasses()` | 7 |
+| Shipping methods | `client.ShippingMethods()` | 7 |
 | Shipping profiles | `client.ShippingProfiles()` | 11 |
 | Shipping rates | `client.ShippingRates()` | 10 |
 | Shipping rules | `client.ShippingRules()` | 10 |
 | Shipping settings | `client.ShippingSettings()` | 3 |
 | Shopping cart settings | `client.ShoppingCartSettings()` | 5 |
 | Site settings | `client.SiteSettings()` | 5 |
-| Tax codes | `client.TaxCodes()` | 7 |
+| Tax codes | `client.TaxCodes()` | 5 |
 | Tax country taxes | `client.TaxCountryTaxes()` | 5 |
 | Tax custom profiles | `client.TaxCustomProfiles()` | 5 |
-| Tax profiles | `client.TaxProfiles()` | 7 |
-| Tax rules | `client.TaxRules()` | 7 |
+| Tax profiles | `client.TaxProfiles()` | 5 |
+| Tax rules | `client.TaxRules()` | 5 |
 | Tax settings | `client.TaxSettings()` | 4 |
-| Tax zones | `client.TaxZones()` | 7 |
+| Tax zones | `client.TaxZones()` | 5 |
 | Transactions | `client.Transactions()` | 6 |
 | Trash | `client.Trash()` | 9 |
 | Variations | `client.Variations()` | 16 |

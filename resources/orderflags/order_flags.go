@@ -25,16 +25,6 @@ func (o *OrderFlags) ListOrderFlags(ctx context.Context, queryParams map[string]
 		ResponseFormat: format, DTOShape: OrderFlagPageShape})
 }
 
-// HeadOrderFlags asks whether the collection is reachable — HEAD /admin/order_flags.
-func (o *OrderFlags) HeadOrderFlags(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return o.requester.SendApiRequest(ctx, "HEAD", OrderFlagsPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CreateOrderFlag creates a flag — POST /admin/order_flags, wrapped in order_flag; name and a hex color are required.
 func (o *OrderFlags) CreateOrderFlag(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
@@ -58,17 +48,6 @@ func (o *OrderFlags) GetOrderFlag(ctx context.Context, orderFlagID any, raiseOnE
 	return o.requester.SendGetRequest(ctx, OrderFlagPath, &http.RequestOptions{
 		PathParams: map[string]any{"order_flag_id": orderFlagID}, RaiseOnError: raiseOnError,
 		ResponseFormat: format, DTOShape: OrderFlagShape})
-}
-
-// HeadOrderFlag asks whether one flag is there — HEAD /admin/order_flags/{order_flag_id}.
-func (o *OrderFlags) HeadOrderFlag(ctx context.Context, orderFlagID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return o.requester.SendApiRequest(ctx, "HEAD", OrderFlagPath, &http.RequestOptions{
-		PathParams: map[string]any{"order_flag_id": orderFlagID}, RaiseOnError: raiseOnError,
-		ResponseFormat: format})
 }
 
 // UpdateOrderFlag replaces one flag — PUT /admin/order_flags/{order_flag_id}; send the full record, as PATCH is 405.

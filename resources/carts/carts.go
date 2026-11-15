@@ -14,7 +14,7 @@ type Carts struct {
 	requester http.Requester
 }
 
-// AddCartItem adds a product to the cart session_id names, creating it — POST /carts, 201; re-adding raises the line's quantity. customer_id is the customer's internal_id.
+// AddCartItem adds a product to the cart session_id names, creating it — POST /carts, 201; re-adding raises the line's quantity. customer_id is the customer's customer_id.
 func (c *Carts) AddCartItem(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (c *Carts) DeleteCartItem(ctx context.Context, sessionID string, cartItemID
 		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
-// CreateOrderFromCart turns the cart into an order — POST /admin/orders/carts/{session_id}, 201, and the cart is gone. customer_id is the customer's customer_id, not its internal_id. transactionNo is sent as X-Transaction-No and files the order under that number; empty sends none.
+// CreateOrderFromCart turns the cart into an order — POST /admin/orders/carts/{session_id}, 201, and the cart is gone. customer_id is the customer's customer_id. transactionNo is sent as X-Transaction-No and files the order under that number; empty sends none.
 func (c *Carts) CreateOrderFromCart(ctx context.Context, sessionID string, payload any, transactionNo string, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
 		return nil, err

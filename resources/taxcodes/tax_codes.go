@@ -25,16 +25,6 @@ func (t *TaxCodes) ListTaxCodes(ctx context.Context, queryParams map[string]any,
 		ResponseFormat: format, DTOShape: TaxCodePageShape})
 }
 
-// HeadTaxCodes asks whether the collection is reachable — HEAD /admin/tax_codes.
-func (t *TaxCodes) HeadTaxCodes(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxCodesPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CreateTaxCode creates a tax code — POST /admin/tax_codes, wrapped in tax_code; name is required.
 func (t *TaxCodes) CreateTaxCode(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
@@ -58,17 +48,6 @@ func (t *TaxCodes) GetTaxCode(ctx context.Context, taxCodeID any, raiseOnError *
 	return t.requester.SendGetRequest(ctx, TaxCodePath, &http.RequestOptions{
 		PathParams:   map[string]any{"tax_code_id": taxCodeID},
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: TaxCodeShape})
-}
-
-// HeadTaxCode answers 200 even for an unknown id — HEAD /admin/tax_codes/{tax_code_id}; use GetTaxCode to check a row.
-func (t *TaxCodes) HeadTaxCode(ctx context.Context, taxCodeID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxCodePath, &http.RequestOptions{
-		PathParams:   map[string]any{"tax_code_id": taxCodeID},
-		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // UpdateTaxCode updates one tax code — PUT /admin/tax_codes/{tax_code_id}; send priority and resolver_type, as they reset.

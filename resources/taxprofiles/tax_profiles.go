@@ -25,16 +25,6 @@ func (t *TaxProfiles) ListTaxProfiles(ctx context.Context, queryParams map[strin
 		ResponseFormat: format, DTOShape: TaxProfilePageShape})
 }
 
-// HeadTaxProfiles asks whether the collection is reachable — HEAD /admin/tax_profiles.
-func (t *TaxProfiles) HeadTaxProfiles(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxProfilesPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CreateTaxProfile creates a tax profile — POST /admin/tax_profiles, wrapped in tax_profile; an id in the body is 500.
 func (t *TaxProfiles) CreateTaxProfile(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
@@ -58,17 +48,6 @@ func (t *TaxProfiles) GetTaxProfile(ctx context.Context, taxProfileID any, raise
 	return t.requester.SendGetRequest(ctx, TaxProfilePath, &http.RequestOptions{
 		PathParams:   map[string]any{"tax_profile_id": taxProfileID},
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: TaxProfileShape})
-}
-
-// HeadTaxProfile asks whether the path answers — HEAD /admin/tax_profiles/{tax_profile_id}; an unknown id is 200 too.
-func (t *TaxProfiles) HeadTaxProfile(ctx context.Context, taxProfileID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxProfilePath, &http.RequestOptions{
-		PathParams:   map[string]any{"tax_profile_id": taxProfileID},
-		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // UpdateTaxProfile merges into one tax profile — PUT /admin/tax_profiles/{tax_profile_id}; default true moves the flag.

@@ -25,7 +25,7 @@ type ProductParent struct {
 	IsDisposable    *bool
 }
 
-// ProductSelectedCustomer is one customer an audience names: ID is the customer's customer_id, InternalID its internal_id.
+// ProductSelectedCustomer is one customer an audience names: ID is the customer's customer_id; InternalID is for reference.
 type ProductSelectedCustomer struct {
 	ID         *int64
 	InternalID *int64

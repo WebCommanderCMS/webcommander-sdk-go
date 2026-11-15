@@ -25,16 +25,6 @@ func (i *InventoryLocations) ListInventoryLocations(ctx context.Context, queryPa
 		ResponseFormat: format, DTOShape: InventoryLocationPageShape})
 }
 
-// HeadInventoryLocations asks whether the collection is reachable — HEAD /admin/inventory_locations.
-func (i *InventoryLocations) HeadInventoryLocations(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return i.requester.SendApiRequest(ctx, "HEAD", InventoryLocationsPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CreateInventoryLocation creates a location — POST /admin/inventory_locations as a bare record; default true moves the flag.
 func (i *InventoryLocations) CreateInventoryLocation(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
@@ -58,17 +48,6 @@ func (i *InventoryLocations) GetInventoryLocation(ctx context.Context, inventory
 	return i.requester.SendGetRequest(ctx, InventoryLocationPath, &http.RequestOptions{
 		PathParams:   map[string]any{"inventory_location_id": inventoryLocationID},
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: InventoryLocationShape})
-}
-
-// HeadInventoryLocation asks whether one location is there — HEAD /admin/inventory_locations/{inventory_location_id}.
-func (i *InventoryLocations) HeadInventoryLocation(ctx context.Context, inventoryLocationID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return i.requester.SendApiRequest(ctx, "HEAD", InventoryLocationPath, &http.RequestOptions{
-		PathParams:   map[string]any{"inventory_location_id": inventoryLocationID},
-		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // UpdateInventoryLocation replaces one location — PUT /admin/inventory_locations/{inventory_location_id}; an omitted address is cleared, an omitted active reads true.

@@ -25,16 +25,6 @@ func (t *TaxZones) ListTaxZones(ctx context.Context, queryParams map[string]any,
 		ResponseFormat: format, DTOShape: TaxZonePageShape})
 }
 
-// HeadTaxZones asks whether the collection is reachable — HEAD /admin/tax_zones.
-func (t *TaxZones) HeadTaxZones(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxZonesPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CreateTaxZone creates a tax zone — POST /admin/tax_zones, wrapped in tax_zone; countries and states take [{"id": 12}] records.
 func (t *TaxZones) CreateTaxZone(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
@@ -58,17 +48,6 @@ func (t *TaxZones) GetTaxZone(ctx context.Context, taxZoneID any, raiseOnError *
 	return t.requester.SendGetRequest(ctx, TaxZonePath, &http.RequestOptions{
 		PathParams:   map[string]any{"tax_zone_id": taxZoneID},
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: TaxZoneShape})
-}
-
-// HeadTaxZone answers 200 even for an unknown id — HEAD /admin/tax_zones/{tax_zone_id}, so it is no existence check.
-func (t *TaxZones) HeadTaxZone(ctx context.Context, taxZoneID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxZonePath, &http.RequestOptions{
-		PathParams:   map[string]any{"tax_zone_id": taxZoneID},
-		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // UpdateTaxZone updates one tax zone — PUT /admin/tax_zones/{tax_zone_id}; name is required and the lists are replaced.

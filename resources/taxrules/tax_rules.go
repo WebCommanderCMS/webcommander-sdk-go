@@ -25,16 +25,6 @@ func (t *TaxRules) ListTaxRules(ctx context.Context, queryParams map[string]any,
 		ResponseFormat: format, DTOShape: TaxRulePageShape})
 }
 
-// HeadTaxRules asks whether the collection is reachable — HEAD /admin/tax_rules.
-func (t *TaxRules) HeadTaxRules(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxRulesPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CreateTaxRule creates a tax rule — POST /admin/tax_rules, wrapped in tax_rule; only name and description are stored.
 func (t *TaxRules) CreateTaxRule(ctx context.Context, payload any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
@@ -58,17 +48,6 @@ func (t *TaxRules) GetTaxRule(ctx context.Context, taxRuleID any, raiseOnError *
 	return t.requester.SendGetRequest(ctx, TaxRulePath, &http.RequestOptions{
 		PathParams:   map[string]any{"tax_rule_id": taxRuleID},
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: TaxRuleShape})
-}
-
-// HeadTaxRule asks whether the path answers — HEAD /admin/tax_rules/{tax_rule_id}; an unknown id is 200 too.
-func (t *TaxRules) HeadTaxRule(ctx context.Context, taxRuleID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return t.requester.SendApiRequest(ctx, "HEAD", TaxRulePath, &http.RequestOptions{
-		PathParams:   map[string]any{"tax_rule_id": taxRuleID},
-		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // UpdateTaxRule merges into one tax rule — PUT /admin/tax_rules/{tax_rule_id}, wrapped in tax_rule; code and zones are fixed.

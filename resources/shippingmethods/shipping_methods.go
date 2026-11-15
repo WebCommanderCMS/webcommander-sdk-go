@@ -25,16 +25,6 @@ func (s *ShippingMethods) ListShippingMethods(ctx context.Context, queryParams m
 		ResponseFormat: format, DTOShape: ShippingMethodPageShape})
 }
 
-// HeadShippingMethods asks whether the collection is reachable — HEAD /admin/shipping_methods.
-func (s *ShippingMethods) HeadShippingMethods(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return s.requester.SendApiRequest(ctx, "HEAD", ShippingMethodsPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CountShippingMethods is how many methods the store holds — GET /admin/shipping_methods/count.
 func (s *ShippingMethods) CountShippingMethods(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
@@ -70,17 +60,6 @@ func (s *ShippingMethods) GetShippingMethod(ctx context.Context, shippingMethodI
 		PathParams:  map[string]any{"shipping_method_id": shippingMethodID},
 		QueryParams: queryParams, RaiseOnError: raiseOnError,
 		ResponseFormat: format, DTOShape: ShippingMethodShape})
-}
-
-// HeadShippingMethod answers 200 even for an unknown id — HEAD /admin/shipping_methods/{shipping_method_id}.
-func (s *ShippingMethods) HeadShippingMethod(ctx context.Context, shippingMethodID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return s.requester.SendApiRequest(ctx, "HEAD", ShippingMethodPath, &http.RequestOptions{
-		PathParams:   map[string]any{"shipping_method_id": shippingMethodID},
-		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // UpdateShippingMethod renames one method — PUT /admin/shipping_methods/{shipping_method_id}; name is the one field read.

@@ -28,9 +28,8 @@ const (
 
 	OrderUpdateStatusPath = "/api/{api_version}/admin/orders/{order_id}/update-status"
 
-	// These two resolve the slot against the order's internal_id; an order_id there names another order, or none.
-	OrderCustomFieldsPath = "/api/{api_version}/admin/orders/{order_internal_id}/custom_fields"
-	OrderSendInvoicePath  = "/api/{api_version}/admin/orders/{order_internal_id}/send-invoice"
+	OrderCustomFieldsPath = "/api/{api_version}/admin/orders/{order_id}/custom_fields"
+	OrderSendInvoicePath  = "/api/{api_version}/admin/orders/{order_id}/send-invoice"
 
 	PaymentRefundsPath = "/api/{api_version}/admin/payment/{payment_id}/refunds"
 

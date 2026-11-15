@@ -44,7 +44,6 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/inventorylocations"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/ordercustomfields"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderflags"
-	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderpreviews"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orders"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/pages"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/paymentgateways"
@@ -111,7 +110,7 @@ type WebCommanderClient struct {
 	searchSettings       lazy[*searchsettings.SearchSettingsResource]
 	ecommerceSettings    lazy[*ecommercesettings.EcommerceSettingsResource]
 	orderFlags           lazy[*orderflags.OrderFlags]
-	orderPreviews        lazy[*orderpreviews.OrderPreviews]
+	adminCarts           lazy[*carts.AdminCarts]
 	orders               lazy[*orders.Orders]
 	inventoryLocations   lazy[*inventorylocations.InventoryLocations]
 	products             lazy[*products.Products]
@@ -452,9 +451,9 @@ func (c *WebCommanderClient) OrderFlags() *orderflags.OrderFlags {
 	return c.orderFlags.get(func() *orderflags.OrderFlags { return orderflags.New(c) })
 }
 
-// OrderPreviews is built and cached on first use.
-func (c *WebCommanderClient) OrderPreviews() *orderpreviews.OrderPreviews {
-	return c.orderPreviews.get(func() *orderpreviews.OrderPreviews { return orderpreviews.New(c) })
+// AdminCarts is built and cached on first use.
+func (c *WebCommanderClient) AdminCarts() *carts.AdminCarts {
+	return c.adminCarts.get(func() *carts.AdminCarts { return carts.NewAdminCarts(c) })
 }
 
 // Orders is built and cached on first use.

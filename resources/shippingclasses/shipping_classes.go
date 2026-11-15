@@ -25,16 +25,6 @@ func (s *ShippingClasses) ListShippingClasses(ctx context.Context, queryParams m
 		ResponseFormat: format, DTOShape: ShippingClassPageShape})
 }
 
-// HeadShippingClasses asks whether the collection answers — HEAD /admin/shipping_classes.
-func (s *ShippingClasses) HeadShippingClasses(ctx context.Context, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return s.requester.SendApiRequest(ctx, "HEAD", ShippingClassesPath, &http.RequestOptions{
-		RaiseOnError: raiseOnError, ResponseFormat: format})
-}
-
 // CountShippingClasses is how many classes the store holds — GET /admin/shipping_classes/count; no parameter narrows it.
 func (s *ShippingClasses) CountShippingClasses(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
@@ -70,17 +60,6 @@ func (s *ShippingClasses) GetShippingClass(ctx context.Context, shippingClassID 
 		PathParams:  map[string]any{"shipping_class_id": shippingClassID},
 		QueryParams: queryParams, RaiseOnError: raiseOnError,
 		ResponseFormat: format, DTOShape: ShippingClassShape})
-}
-
-// HeadShippingClass is HEAD /admin/shipping_classes/{shipping_class_id}; it is 200 for an unknown id, so it checks the path only.
-func (s *ShippingClasses) HeadShippingClass(ctx context.Context, shippingClassID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
-	format, err := oneResponseFormat(responseFormat)
-	if err != nil {
-		return nil, err
-	}
-	return s.requester.SendApiRequest(ctx, "HEAD", ShippingClassPath, &http.RequestOptions{
-		PathParams:   map[string]any{"shipping_class_id": shippingClassID},
-		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
 // UpdateShippingClass replaces one class — PUT /admin/shipping_classes/{shipping_class_id}; an omitted description comes back null.

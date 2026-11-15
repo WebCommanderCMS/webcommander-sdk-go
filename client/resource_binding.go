@@ -30,7 +30,6 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/inventorylocations"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/ordercustomfields"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderflags"
-	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderpreviews"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orders"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/pages"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/paymentgateways"
@@ -73,8 +72,8 @@ var (
 		orderflags.ResourceName: func(requester http.Requester) any {
 			return orderflags.New(requester)
 		},
-		orderpreviews.ResourceName: func(requester http.Requester) any {
-			return orderpreviews.New(requester)
+		carts.AdminCartsResourceName: func(requester http.Requester) any {
+			return carts.NewAdminCarts(requester)
 		},
 		inventorylocations.ResourceName: func(requester http.Requester) any {
 			return inventorylocations.New(requester)

@@ -34,10 +34,11 @@ type BlogAuthor struct {
 	Name *string
 }
 
-// BlogAudienceMember is one customer, by internal_id, or one customer group a restricted blog is shown to.
+// BlogAudienceMember is one customer, by customer_id, or one customer group a restricted blog is shown to. A customer also carries its internal_id, for reference.
 type BlogAudienceMember struct {
-	ID   *int64
-	Name *string
+	ID         *int64
+	InternalID *int64
+	Name       *string
 }
 
 // BlogAudience is selected_customers once it names anyone; the store sends [] when it names no one, read as nil.
@@ -46,7 +47,7 @@ type BlogAudience struct {
 	Groups    []*BlogAudienceMember
 }
 
-// BlogAudienceInput is the audience a write names: customer internal_id values and customer group ids.
+// BlogAudienceInput is the audience a write names: customer customer_id values and customer group ids.
 type BlogAudienceInput struct {
 	Customers []int64
 	Groups    []int64
@@ -115,7 +116,7 @@ type BlogInput struct {
 	Categories  []*BlogCategoryReference
 	Image       *BlogImageInput
 	SeoConfigs  *BlogSeoConfigs
-	// SelectedCustomers names customers by internal_id; a customer_id there is dropped without a refusal.
+	// SelectedCustomers names customers by customer_id and groups by id.
 	SelectedCustomers *BlogAudienceInput
 }
 

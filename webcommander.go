@@ -35,7 +35,6 @@ import (
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/inventorylocations"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/ordercustomfields"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderflags"
-	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orderpreviews"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/orders"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/pages"
 	"github.com/WebCommanderCMS/webcommander-sdk-go/v4/resources/paymentgateways"
@@ -1426,6 +1425,86 @@ const (
 
 	// CartsTransactionNoHeader is the header CreateOrderFromCart sends transactionNo under.
 	CartsTransactionNoHeader = carts.CartsTransactionNoHeader
+)
+
+// AdminCarts is the admin cart and checkout endpoints bound to a client.
+type AdminCarts = carts.AdminCarts
+
+type (
+	// AdminCart is a cart: what every cart call but the deletes answers.
+	AdminCart = carts.AdminCart
+	// AdminCartSession is the session block: session_id, status and the 30-minute window.
+	AdminCartSession = carts.AdminCartSession
+	// AdminCartCustomer is the customer the cart is for.
+	AdminCartCustomer = carts.AdminCartCustomer
+	// AdminCartItem is one priced line; CartItemID is what the line's update and delete take.
+	AdminCartItem = carts.AdminCartItem
+	// AdminCartTotals is the cart's money before shipping.
+	AdminCartTotals = carts.AdminCartTotals
+	// AdminCheckout is the checkout of a cart.
+	AdminCheckout = carts.AdminCheckout
+	// CheckoutAddress is a billing or shipping address as the checkout reads it back.
+	CheckoutAddress = carts.CheckoutAddress
+	// CheckoutShipping is the delivery the checkout was priced for.
+	CheckoutShipping = carts.CheckoutShipping
+	// CheckoutDiscounts holds the applied coupon and gift card, each nil when none is applied.
+	CheckoutDiscounts = carts.CheckoutDiscounts
+	// CheckoutCoupon is the applied coupon.
+	CheckoutCoupon = carts.CheckoutCoupon
+	// CheckoutGiftCard is the applied gift card.
+	CheckoutGiftCard = carts.CheckoutGiftCard
+	// CheckoutTotals is the checkout's money; a gift card lowers Due, not GrandTotal.
+	CheckoutTotals = carts.CheckoutTotals
+	// CheckoutIssue is one thing still blocking a confirm.
+	CheckoutIssue = carts.CheckoutIssue
+	// AdminCartInput is the create and replace body, bare; its lines are AdminCartProductInput.
+	AdminCartInput = carts.AdminCartInput
+	// AdminCartProductInput is one product line to put on a cart.
+	AdminCartProductInput = carts.AdminCartProductInput
+	// AdminCartCustomerInput is the cart update body.
+	AdminCartCustomerInput = carts.AdminCartCustomerInput
+	// AdminCartItemsInput is the add-lines body.
+	AdminCartItemsInput = carts.AdminCartItemsInput
+	// AdminCartItemUpdateInput is the line update body.
+	AdminCartItemUpdateInput = carts.AdminCartItemUpdateInput
+	// AdminCheckoutInput is the checkout update body; its addresses are OrderAddressInput.
+	AdminCheckoutInput = carts.AdminCheckoutInput
+	// AdminCheckoutCodeInput is the body of the coupon and the gift card call.
+	AdminCheckoutCodeInput = carts.AdminCheckoutCodeInput
+	// AdminCheckoutPaymentInput is the payment a confirm records.
+	AdminCheckoutPaymentInput = carts.AdminCheckoutPaymentInput
+	// AdminCheckoutConfirmInput is the confirm body, bare; the answer is a FlatOrder.
+	AdminCheckoutConfirmInput = carts.AdminCheckoutConfirmInput
+	// AdminCheckoutDeliveryScheduleInput is the delivery schedule to choose.
+	AdminCheckoutDeliveryScheduleInput = carts.AdminCheckoutDeliveryScheduleInput
+)
+
+// NewAdminCarts binds the resource to a requester of your own.
+func NewAdminCarts(requester Requester) *AdminCarts { return carts.NewAdminCarts(requester) }
+
+// AdminCartShape is the DTOShape for a body shaped {"cart": {…}} in the admin cart shape.
+func AdminCartShape(decoded any) any { return carts.AdminCartShape(decoded) }
+
+// AdminCheckoutShape is the DTOShape for a body shaped {"checkout": {…}}.
+func AdminCheckoutShape(decoded any) any { return carts.AdminCheckoutShape(decoded) }
+
+const (
+	AdminCartsPath                     = carts.AdminCartsPath
+	AdminCartPath                      = carts.AdminCartPath
+	AdminCartItemsPath                 = carts.AdminCartItemsPath
+	AdminCartItemPath                  = carts.AdminCartItemPath
+	AdminCheckoutPath                  = carts.AdminCheckoutPath
+	AdminCheckoutConfirmPath           = carts.AdminCheckoutConfirmPath
+	AdminCheckoutCouponPath            = carts.AdminCheckoutCouponPath
+	AdminCheckoutGiftCardPath          = carts.AdminCheckoutGiftCardPath
+	AdminCheckoutDeliverySchedulesPath = carts.AdminCheckoutDeliverySchedulesPath
+
+	// AdminCartKey and AdminCheckoutKey wrap the answers; the request bodies are bare.
+	AdminCartKey     = carts.AdminCartKey
+	AdminCheckoutKey = carts.AdminCheckoutKey
+
+	// AdminCartsTransactionNoHeader is the header ConfirmCheckout sends transactionNo under.
+	AdminCartsTransactionNoHeader = carts.AdminCartsTransactionNoHeader
 )
 
 // Blogs is the blog endpoints, the comment sub-collection included, bound to a client.
@@ -3336,55 +3415,6 @@ const (
 
 	// ShippingRulesTransactionNoHeader is the header CreateShippingRule sends transactionNo under.
 	ShippingRulesTransactionNoHeader = shippingrules.ShippingRulesTransactionNoHeader
-)
-
-// OrderPreviews is the order preview endpoints bound to a client.
-type OrderPreviews = orderpreviews.OrderPreviews
-
-type (
-	// OrderPreview is a preview session: the start's and the read's answer, and the coupon and gift card calls' shorter one.
-	OrderPreview = orderpreviews.OrderPreview
-	// PreviewSession is the session block: session_id, status and the 30-minute window.
-	PreviewSession = orderpreviews.PreviewSession
-	// PreviewCustomer is the customer as the preview shows it.
-	PreviewCustomer = orderpreviews.PreviewCustomer
-	// PreviewItem is one priced line of the preview.
-	PreviewItem = orderpreviews.PreviewItem
-	// PreviewShipping is the shipping block, with the shipping tax the totals do not carry.
-	PreviewShipping = orderpreviews.PreviewShipping
-	// PreviewDiscounts holds the applied coupon and gift card, each nil when none is applied.
-	PreviewDiscounts = orderpreviews.PreviewDiscounts
-	// PreviewCoupon is the applied coupon.
-	PreviewCoupon = orderpreviews.PreviewCoupon
-	// PreviewGiftCard is the applied gift card.
-	PreviewGiftCard = orderpreviews.PreviewGiftCard
-	// PreviewTotals are the priced totals.
-	PreviewTotals = orderpreviews.PreviewTotals
-	// OrderPreviewInput is the start body, bare; its addresses and lines are OrderAddressInput and OrderProductInput.
-	OrderPreviewInput = orderpreviews.OrderPreviewInput
-	// OrderPreviewCodeInput is the body of the coupon and the gift card call.
-	OrderPreviewCodeInput = orderpreviews.OrderPreviewCodeInput
-	// OrderPreviewConfirmInput is the confirm body, bare; the answer is a FlatOrder.
-	OrderPreviewConfirmInput = orderpreviews.OrderPreviewConfirmInput
-	// OrderPreviewPaymentInput is the payment a confirm records.
-	OrderPreviewPaymentInput = orderpreviews.OrderPreviewPaymentInput
-)
-
-// NewOrderPreviews binds the resource to a requester of your own.
-func NewOrderPreviews(requester Requester) *OrderPreviews { return orderpreviews.New(requester) }
-
-// OrderPreviewShape is the DTOShape for a body shaped {"order": {…}} in the preview shape.
-func OrderPreviewShape(decoded any) any { return orderpreviews.OrderPreviewShape(decoded) }
-
-const (
-	OrderPreviewsPath        = orderpreviews.OrderPreviewsPath
-	OrderPreviewPath         = orderpreviews.OrderPreviewPath
-	OrderPreviewConfirmPath  = orderpreviews.OrderPreviewConfirmPath
-	OrderPreviewCouponPath   = orderpreviews.OrderPreviewCouponPath
-	OrderPreviewGiftCardPath = orderpreviews.OrderPreviewGiftCardPath
-
-	// OrderPreviewKey wraps every preview answer; the request bodies are bare.
-	OrderPreviewKey = orderpreviews.OrderPreviewKey
 )
 
 // GiftCards is the gift card endpoints bound to a client.

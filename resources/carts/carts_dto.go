@@ -130,7 +130,7 @@ type CartAddressInput struct {
 // ToMap renders the request body.
 func (a CartAddressInput) ToMap() map[string]any { return dto.ToMap(a) }
 
-// CartItemInput is the add's body, no envelope; CustomerID takes the customer's internal_id.
+// CartItemInput is the add's body, no envelope; CustomerID takes the customer's customer_id.
 type CartItemInput struct {
 	// Pointers, so an unset number is omitted rather than sent 0.
 	ProductID       *int64

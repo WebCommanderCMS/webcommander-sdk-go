@@ -14,7 +14,7 @@ type Orders struct {
 	requester http.Requester
 }
 
-// ListOrders lists orders — GET /admin/orders, newest first; cancelled only under order_status. limit caps at 20, customerId takes an internal_id, an unknown name is 400.
+// ListOrders lists orders — GET /admin/orders, newest first; cancelled only under order_status. limit caps at 20, customerId takes a customer_id, an unknown name is 400.
 func (o *Orders) ListOrders(ctx context.Context, queryParams map[string]any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {
@@ -172,14 +172,14 @@ func (o *Orders) CreateOrderComment(ctx context.Context, orderID any, payload an
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: OrderCommentShape})
 }
 
-// GetOrderCustomFields reads an order's custom field values — GET /admin/orders/{order_internal_id}/custom_fields.
-func (o *Orders) GetOrderCustomFields(ctx context.Context, orderInternalID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+// GetOrderCustomFields reads an order's custom field values — GET /admin/orders/{order_id}/custom_fields.
+func (o *Orders) GetOrderCustomFields(ctx context.Context, orderID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {
 		return nil, err
 	}
 	return o.requester.SendGetRequest(ctx, OrderCustomFieldsPath, &http.RequestOptions{
-		PathParams:   map[string]any{"order_internal_id": orderInternalID},
+		PathParams:   map[string]any{"order_id": orderID},
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: OrderCustomFieldsShape})
 }
 
@@ -238,14 +238,14 @@ func (o *Orders) CreatePaymentRefund(ctx context.Context, paymentID any, payload
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: PaymentRefundShape})
 }
 
-// SendOrderInvoice emails the invoice — POST /admin/orders/{order_internal_id}/send-invoice; no body. Pass internal_id: an order_id there names the order holding it as its internal_id.
-func (o *Orders) SendOrderInvoice(ctx context.Context, orderInternalID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
+// SendOrderInvoice emails the invoice — POST /admin/orders/{order_id}/send-invoice; no body.
+func (o *Orders) SendOrderInvoice(ctx context.Context, orderID any, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	format, err := oneResponseFormat(responseFormat)
 	if err != nil {
 		return nil, err
 	}
 	return o.requester.SendPostRequest(ctx, OrderSendInvoicePath, &http.RequestOptions{
-		PathParams:   map[string]any{"order_internal_id": orderInternalID},
+		PathParams:   map[string]any{"order_id": orderID},
 		RaiseOnError: raiseOnError, ResponseFormat: format, DTOShape: InvoiceDispatchShape})
 }
 
