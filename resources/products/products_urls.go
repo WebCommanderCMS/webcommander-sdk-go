@@ -46,7 +46,7 @@ const ProductSeoKey = "seo"
 // ProductReviewKey is the key a single review answers under.
 const ProductReviewKey = "review"
 
-// ProductsTransactionNoHeader tags a create, a review import or an inventory top-up with a transaction number; it wins over a body transaction_no it disagrees with.
+// ProductsTransactionNoHeader tags a create, a review import or an inventory top-up with a transaction number; a different body transaction_no at the place the store checks it (top level for a create, beside product for a review import) is refused with 400 header_body_mismatch, and one elsewhere in the body is ignored.
 const ProductsTransactionNoHeader = "X-Transaction-No"
 
 // ProductStockLocationsKey is the key the stock rows arrive under, and the one key the stock write requires.

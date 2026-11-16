@@ -27,5 +27,5 @@ const AdminCartKey = "cart"
 // AdminCheckoutKey is the key every checkout answer wraps its record in; the request bodies are bare.
 const AdminCheckoutKey = "checkout"
 
-// AdminCartsTransactionNoHeader files the order a checkout places under this transaction number; it beats a transaction_no body field.
+// AdminCartsTransactionNoHeader files the order a checkout places under this transaction number; a different top-level transaction_no in the body is refused with 400 header_body_mismatch.
 const AdminCartsTransactionNoHeader = "X-Transaction-No"

@@ -21,5 +21,5 @@ const CartSessionKey = "sessionId"
 // CartOrderKey is the key the order a cart became arrives under, beside status.
 const CartOrderKey = "order"
 
-// CartsTransactionNoHeader files the order a cart becomes under this transaction number; it beats a transaction_no body field.
+// CartsTransactionNoHeader files the order a cart becomes under this transaction number; send it here or in the body, not two different numbers.
 const CartsTransactionNoHeader = "X-Transaction-No"

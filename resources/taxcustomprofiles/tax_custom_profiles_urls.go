@@ -41,5 +41,5 @@ func UnroutedMethodBody() map[string]any {
 // TaxCustomProfilesUnknownPathMessage opens the tax router's 404 text for a method the listing path does not route.
 const TaxCustomProfilesUnknownPathMessage = "Unknown tax path"
 
-// TaxCustomProfilesTransactionNoHeader files a new custom profile under this transaction number.
+// TaxCustomProfilesTransactionNoHeader files a new custom profile under this transaction number; a different transaction_no beside custom_profile is refused with 400 header_body_mismatch, and one inside it is ignored.
 const TaxCustomProfilesTransactionNoHeader = "X-Transaction-No"

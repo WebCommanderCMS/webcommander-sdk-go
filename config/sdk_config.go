@@ -21,7 +21,7 @@ import (
 )
 
 // fallbackVersion is reported when the build carries no module version. Bump it on every release.
-const fallbackVersion = "4.0.3"
+const fallbackVersion = "4.0.4"
 
 var sdkVersion = readModuleVersion()
 

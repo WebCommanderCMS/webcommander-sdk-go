@@ -25,5 +25,5 @@ const (
 	AdminCustomerStoreCreditAdjustmentsPath = "/api/{api_version}/admin/customers/{customer_id}/store-credit/adjustments" //#nosec G101 -- a URL path template, not a credential
 )
 
-// AdminCustomersTransactionNoHeader files the new customer under this transaction number; it beats a transaction_no body field.
+// AdminCustomersTransactionNoHeader files the new customer under this transaction number; a different transaction_no beside customer is refused with 400 header_body_mismatch, and one inside customer is ignored.
 const AdminCustomersTransactionNoHeader = "X-Transaction-No"

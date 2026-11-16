@@ -23,5 +23,5 @@ const ShippingRulesPageSize = 20
 
 const ShippingRulesPageSizeCap = 100
 
-// ShippingRulesTransactionNoHeader files a new rule under this transaction number and wins over a transaction_no in the body.
+// ShippingRulesTransactionNoHeader files a new rule under this transaction number; a different transaction_no beside shipping_rule is refused with 400 header_body_mismatch, and one inside it is ignored.
 const ShippingRulesTransactionNoHeader = "X-Transaction-No"

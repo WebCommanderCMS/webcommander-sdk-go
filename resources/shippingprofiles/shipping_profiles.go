@@ -56,7 +56,7 @@ func (s *ShippingProfiles) HeadShippingProfilesCount(ctx context.Context, raiseO
 		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
-// CreateShippingProfile creates a profile — POST /admin/shipping_profiles with {"shipping_profile": {…}}, answered 201 with a Location; name is required and unique without regard to case (409), shipping_rules lists rule ids once each, and an unknown field, an id or an unwrapped body is 400. transactionNo is sent as X-Transaction-No and wins over a transaction_no in the body; empty sends none.
+// CreateShippingProfile creates a profile — POST /admin/shipping_profiles with {"shipping_profile": {…}}, answered 201 with a Location; name is required and unique without regard to case (409), shipping_rules lists rule ids once each, and an unknown field, an id or an unwrapped body is 400. transactionNo is sent as X-Transaction-No; a different transaction_no beside shipping_profile is refused with 400 header_body_mismatch, and one inside it is ignored; empty sends none.
 func (s *ShippingProfiles) CreateShippingProfile(ctx context.Context, payload any, transactionNo string, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
 		return nil, err

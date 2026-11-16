@@ -43,5 +43,5 @@ func CategoriesPaginationKeys() []string {
 	return append(make([]string, 0, len(categoriesPaginationKeys)), categoriesPaginationKeys[:]...)
 }
 
-// CategoriesTransactionNoHeader files a new category under this transaction number; it beats category.transaction_no.
+// CategoriesTransactionNoHeader files a new category under this transaction number; a different transaction_no inside category is refused with 400 header_body_mismatch, and one beside category is ignored.
 const CategoriesTransactionNoHeader = "X-Transaction-No"

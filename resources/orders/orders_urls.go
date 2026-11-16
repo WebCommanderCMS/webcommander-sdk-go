@@ -65,5 +65,5 @@ func OrdersSortFields() []string {
 // OrdersIdempotencyKeyHeader is the header a payment refund is refused without; a repeat under one key replays the first refund.
 const OrdersIdempotencyKeyHeader = "Idempotency-Key"
 
-// OrdersTransactionNoHeader files a created order under this transaction number; it beats a transaction_no body field.
+// OrdersTransactionNoHeader files a created order under this transaction number; a different top-level transaction_no is refused with 400 header_body_mismatch.
 const OrdersTransactionNoHeader = "X-Transaction-No"

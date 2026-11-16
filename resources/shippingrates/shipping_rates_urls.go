@@ -23,5 +23,5 @@ const ShippingRatesPageSize = 20
 
 const ShippingRatesPageSizeCap = 100
 
-// ShippingRatesTransactionNoHeader files a new rate under this transaction number and wins over a transaction_no in the body.
+// ShippingRatesTransactionNoHeader files a new rate under this transaction number; a different transaction_no beside shipping_rate is refused with 400 header_body_mismatch, and one inside it is ignored.
 const ShippingRatesTransactionNoHeader = "X-Transaction-No"

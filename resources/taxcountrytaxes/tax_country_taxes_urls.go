@@ -41,5 +41,5 @@ func UnroutedMethodBody() map[string]any {
 // TaxCountryTaxesUnknownPathMessage opens the tax router's 404 text for a method the listing path does not route.
 const TaxCountryTaxesUnknownPathMessage = "Unknown tax path"
 
-// TaxCountryTaxesTransactionNoHeader files a new country tax under this transaction number.
+// TaxCountryTaxesTransactionNoHeader files a new country tax under this transaction number; a different transaction_no beside country_tax is refused with 400 header_body_mismatch, and one inside it is ignored.
 const TaxCountryTaxesTransactionNoHeader = "X-Transaction-No"

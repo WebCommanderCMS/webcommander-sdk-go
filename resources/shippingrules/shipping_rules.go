@@ -56,7 +56,7 @@ func (s *ShippingRules) HeadShippingRulesCount(ctx context.Context, raiseOnError
 		RaiseOnError: raiseOnError, ResponseFormat: format})
 }
 
-// CreateShippingRule creates a rule — POST /admin/shipping_rules with {"shipping_rule": {…}}, answered 201 with a Location; name is required and unique without regard to case (409), a class, a rate and every zone must exist, zones without a repeat, and profile_id adds the rule to that profile. An unknown field, an id or an unwrapped body is 400. transactionNo is sent as X-Transaction-No and wins over a transaction_no in the body; empty sends none.
+// CreateShippingRule creates a rule — POST /admin/shipping_rules with {"shipping_rule": {…}}, answered 201 with a Location; name is required and unique without regard to case (409), a class, a rate and every zone must exist, zones without a repeat, and profile_id adds the rule to that profile. An unknown field, an id or an unwrapped body is 400. transactionNo is sent as X-Transaction-No; a different transaction_no beside shipping_rule is refused with 400 header_body_mismatch, and one inside it is ignored; empty sends none.
 func (s *ShippingRules) CreateShippingRule(ctx context.Context, payload any, transactionNo string, raiseOnError *bool, responseFormat ...string) (*http.ApiResponse, error) {
 	if err := requirePayload(payload); err != nil {
 		return nil, err

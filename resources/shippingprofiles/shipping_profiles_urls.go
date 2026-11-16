@@ -25,5 +25,5 @@ const ShippingProfilesPageSize = 20
 
 const ShippingProfilesPageSizeCap = 100
 
-// ShippingProfilesTransactionNoHeader files a new profile under this transaction number and wins over a transaction_no in the body.
+// ShippingProfilesTransactionNoHeader files a new profile under this transaction number; a different transaction_no beside shipping_profile is refused with 400 header_body_mismatch, and one inside it is ignored.
 const ShippingProfilesTransactionNoHeader = "X-Transaction-No"

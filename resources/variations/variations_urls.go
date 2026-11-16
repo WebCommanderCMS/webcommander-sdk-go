@@ -15,7 +15,7 @@ const (
 	ProductVariationsBulkPath = "/api/{api_version}/admin/products/{product_id}/variations/bulk"
 )
 
-// VariationsTransactionNoHeader tags a variant import with a transaction number; it wins over a body transaction_no it disagrees with.
+// VariationsTransactionNoHeader tags a variant import with a transaction number; a different top-level transaction_no is refused with 400 header_body_mismatch.
 const VariationsTransactionNoHeader = "X-Transaction-No"
 
 // VariationsKey is the key the listing's rows arrive under, and the product read's groups too.
